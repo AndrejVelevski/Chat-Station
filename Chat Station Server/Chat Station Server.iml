@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="JAVA_MODULE" version="4">
+  <component name="EclipseModuleManager">
+    <libelement value="file://C:/Users/Andrej/Downloads/mysql-connector-java-8.0.16/mysql-connector-java-8.0.16/mysql-connector-java-8.0.16.jar" />
+    <libelement value="file://C:/Users/Andrej/Downloads/kryonet-2.21/kryonet-2.21/jars/production/onejar/kryonet-2.21-all.jar" />
+    <src_description expected_position="0">
+      <src_folder value="file://$MODULE_DIR$/src" expected_position="0" />
+    </src_description>
+  </component>
+  <component name="NewModuleRootManager">
+    <output url="file://$MODULE_DIR$/bin" />
+    <exclude-output />
+    <content url="file://$MODULE_DIR$">
+      <sourceFolder url="file://$MODULE_DIR$/src" isTestSource="false" />
+    </content>
+    <orderEntry type="sourceFolder" forTests="false" />
+    <orderEntry type="jdk" jdkName="12" jdkType="JavaSDK" />
+    <orderEntry type="module-library">
+      <library name="mysql-connector-java-8.0.16.jar">
+        <CLASSES>
+          <root url="file://C:/Users/Andrej/Downloads/mysql-connector-java-8.0.16/mysql-connector-java-8.0.16/mysql-connector-java-8.0.16.jar" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library name="kryonet-2.21-all.jar">
+        <CLASSES>
+          <root url="file://C:/Users/Andrej/Downloads/kryonet-2.21/kryonet-2.21/jars/production/onejar/kryonet-2.21-all.jar" />
+        </CLASSES>
+        <JAVADOC>
+          <root url="file:/C:/Users/Andrej/Downloads/kryonet-2.21/kryonet-2.21/javadoc/" />
+        </JAVADOC>
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="libs" level="project" />
+  </component>
+</module>

@@ -14,11 +14,6 @@ import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Server;
 
-class MessagePacket
-{
-    public String text;
-}
-
 public class Main
 {
 	public static void main(String[] args) throws IOException
@@ -82,7 +77,8 @@ public class Main
 		    	{
 		    		String url = "jdbc:mysql://localhost:3306/sakila?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 		    		String user = "root";
-		    		String password = "qwerty";
+		    		//String password = "qwerty";
+					String password = "admin";
 		    		
 		    		java.sql.Connection connection = null;
 		    		 
