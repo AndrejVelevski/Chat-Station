@@ -1,0 +1,1 @@
+include ':app', ':kryonet-2.21-all', ':mysql-connector-java-8.0.16'
