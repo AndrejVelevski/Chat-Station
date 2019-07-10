@@ -18,7 +18,6 @@ public class Main
 {
 	public static void main(String[] args) throws IOException
 	{
-		//Comment 123
 		Server server = new Server();
 	    server.bind(54555);
 	    
@@ -75,48 +74,7 @@ public class Main
 		    	}
 		    	case "/sql":
 		    	{
-		    		String url = "jdbc:mysql://localhost:3306/sakila?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
-		    		String user = "root";
-		    		//String password = "qwerty";
-					String password = "admin";
-		    		
-		    		java.sql.Connection connection = null;
-		    		 
-		    		try {
-						connection = DriverManager.getConnection(url, user, password);
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-		    		
-		    		Statement statement = null;
-					try {
-						statement = connection.createStatement();
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-		    		
-		    		String query = "SELECT * FROM actor";
-		    		ResultSet rs = null;
-		    		try {
-						rs = statement.executeQuery(query);
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
-		    		
-		    		try {
-						while (rs.next())
-						{
-							int actor_id = rs.getInt("actor_id");
-							String first_name = rs.getString("first_name");
-							String last_name = rs.getString("last_name");
-							String last_update = rs.getString("last_update");
-				
-							
-							System.out.println(String.format("%-10d%-20s%-20s%-20s", actor_id, first_name, last_name, last_update));
-						}
-					} catch (SQLException e) {
-						e.printStackTrace();
-					}
+		    		Database db = new Database("chatstation");
 		    	}
 	    	}
 	    }
