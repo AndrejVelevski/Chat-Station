@@ -1,1 +1,13 @@
+*.iml
+Chat Station Server/.idea
+/.idea
+/local.properties
+/.idea/caches/build_file_checksums.ser
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
 Chat Station Server/src/ConfigConstants.java
