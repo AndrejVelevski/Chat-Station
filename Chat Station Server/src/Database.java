@@ -8,7 +8,7 @@ public class Database
 {
 	static final String url = "jdbc:mysql://localhost:3306/";
 	static final String user = "root";
-	static final String password = "qwerty";
+	static final String password = ConfigConstants.db_password;
 	static final String parametars = "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 	
 	Connection connection;
