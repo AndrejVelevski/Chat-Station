@@ -4,15 +4,17 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import Packets.User;
+
 public class Database
 {
-	static final String url = "jdbc:mysql://localhost:3306/";
-	static final String user = "root";
-	static final String password = ConfigConstants.db_password;
-	static final String parametars = "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
+	private static final String url = "jdbc:mysql://localhost:3306/";
+	private static final String user = "root";
+	private static final String password = ConfigConstants.db_password;
+	private static final String parametars = "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 	
-	Connection connection;
-	Statement statement = null;
+	private Connection connection;
+	private Statement statement;
 	
 	public Database(String name)
 	{
@@ -31,18 +33,6 @@ public class Database
 		}
 		
 		generateTables();
-		
-		
-		//ovde eksplicitno gi staviv vo koi koloni zaradi id (poso e auto generate)
-		/*String sql = "INSERT INTO user(username, email, password, fullname)"
-				+ "VALUES('User2', 'user@user.com', 'user123', 'User Userovski')";
-		try {
-			statement.execute(sql);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		*/
 	}
 
 	private void createDatabase(String name)
@@ -74,7 +64,7 @@ public class Database
 	
 	private void generateTables()
 	{
-String sql;
+		String sql;
 		
 		sql =
 		  "CREATE TABLE user"
@@ -85,6 +75,7 @@ String sql;
 		+ "password VARCHAR(50) NOT NULL,"
 		+ "fullname VARCHAR(80),"
 		+ "age INT,"
+		+ "location VARCHAR(200),"
 		+ "PRIMARY KEY (id)"
 		+ ")"; 
 		createTable("user", sql);
@@ -145,6 +136,52 @@ String sql;
 			System.out.println(String.format("Table '%s' create successfully...", name));
 		}
 		catch (Exception e)
+		{
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	public void addUser(User user) throws AlreadyExistsException
+	{
+		String sql;
+		
+		//Check if email already exists
+		sql = 
+		String.format(
+		  "SELECT * FROM user "
+		+ "WHERE email = '%s';",
+		user.email);
+		try 
+		{
+			ResultSet rs = statement.executeQuery(sql);
+			rs.last();
+			if (rs.getRow() > 0)
+				throw new AlreadyExistsException(String.format("Email %s already exists.", user.email));
+		} catch (SQLException e) {e.printStackTrace();}
+		
+		//Check if username already exists
+		sql = 
+		String.format(
+		  "SELECT * FROM user "
+		+ "WHERE username = '%s';",
+		user.username);
+		try 
+		{
+			ResultSet rs = statement.executeQuery(sql);
+			rs.last();
+			if (rs.getRow() > 0)
+				throw new AlreadyExistsException(String.format("Username %s already exists.", user.username));
+		} catch (SQLException e) {e.printStackTrace();}
+		
+		sql =
+		String.format(
+		  "INSERT INTO user(username, email, password, fullname, location, age)"
+		+ "VALUES('%s', '%s', '%s', '%s', '%s', %d);",
+		user.username, user.email, user.password, user.fullname, user.location, user.age);
+		try
+		{
+			statement.execute(sql);
+		} catch (SQLException e)
 		{
 			System.out.println(e.getMessage());
 		}

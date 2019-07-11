@@ -4,22 +4,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Build;
 import android.os.Bundle;
-import android.os.RecoverySystem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
-import android.widget.Adapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextClock;
-import android.widget.TextView;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.mpip.chatstation.Adapters.MessageBoxAdapter;
 import com.mpip.chatstation.Networking.SendPacketThread;
-import com.mpip.chatstation.Packets.MessagePacket;
 import com.mpip.chatstation.R;
 
 import java.util.ArrayList;
@@ -27,7 +20,7 @@ import java.util.List;
 
 public class ChatRoomActivity extends AppCompatActivity
 {
-    RecyclerView rvMessageBox;
+    /*RecyclerView rvMessageBox;
     RecyclerView.Adapter mbAdapter;
     RecyclerView.LayoutManager layoutManager;
 
@@ -99,10 +92,10 @@ public class ChatRoomActivity extends AppCompatActivity
             new SendPacketThread(mp).start();
         }
         etMessage.setText("");
-        /*try
-        {
-            InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
-        } catch (Exception e) {}*/
-    }
+        //try
+        //{
+            //InputMethodManager imm = (InputMethodManager)getSystemService(INPUT_METHOD_SERVICE);
+            //imm.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
+        //} catch (Exception e) {}
+    }*/
 }

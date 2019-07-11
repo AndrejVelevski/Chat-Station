@@ -14,6 +14,14 @@ public class SendPacketThread extends Thread
     @Override
     public void run()
     {
-        MainActivity.client.sendTCP(packet);
+        try
+        {
+            MainActivity.client.sendTCP(packet);
+        }
+        catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+
     }
 }
