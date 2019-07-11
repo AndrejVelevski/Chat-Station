@@ -5,6 +5,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import Packets.User;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class Database
 {
@@ -72,7 +73,7 @@ public class Database
 		+ "id INT AUTO_INCREMENT,"
 		+ "username VARCHAR(50) UNIQUE NOT NULL,"
 		+ "email VARCHAR(50) UNIQUE NOT NULL,"
-		+ "password VARCHAR(50) NOT NULL,"
+		+ "password VARCHAR(200) NOT NULL,"
 		+ "fullname VARCHAR(80),"
 		+ "age INT,"
 		+ "location VARCHAR(200),"
@@ -168,16 +169,29 @@ public class Database
 		try 
 		{
 			ResultSet rs = statement.executeQuery(sql);
+
 			rs.last();
 			if (rs.getRow() > 0)
 				throw new AlreadyExistsException(String.format("Username %s already exists.", user.username));
 		} catch (SQLException e) {e.printStackTrace();}
-		
+
+		// Hash the password
+		String hashedPassword = BCrypt.hashpw(user.password, BCrypt.gensalt());
+
+		//Za logiranje
+		//Check that an unencrypted password matches one that has
+		//previously been hashed
+		//if (BCrypt.checkpw(password, hashedPassword))
+		//	System.out.println("It matches");
+		//else
+		//	System.out.println("It does not match");
+
 		sql =
 		String.format(
 		  "INSERT INTO user(username, email, password, fullname, location, age)"
 		+ "VALUES('%s', '%s', '%s', '%s', '%s', %d);",
-		user.username, user.email, user.password, user.fullname, user.location, user.age);
+		user.username, user.email, hashedPassword, user.fullname, user.location, user.age);
+
 		try
 		{
 			statement.execute(sql);

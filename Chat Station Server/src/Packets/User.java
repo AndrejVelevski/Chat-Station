@@ -9,4 +9,5 @@ public class User
     public String fullname;
     public Integer age;
     public String location;
+
 }
