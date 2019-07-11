@@ -11,3 +11,4 @@ Chat Station Server/.idea
 /captures
 .externalNativeBuild
 Chat Station Server/src/ConfigConstants.java
+Chat Station Server/bin/
