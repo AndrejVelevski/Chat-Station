@@ -5,7 +5,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 import Config.ConfigConstants;
-import Packets.User;
+import Packets.LoginPacket;
+import Packets.ReceiveUserPacket;
+import Packets.RegisterPacket;
+import Packets.RequestUserPacket;
 
 public class Database
 {
@@ -73,10 +76,10 @@ public class Database
 		+ "id INT AUTO_INCREMENT,"
 		+ "username VARCHAR(50) UNIQUE NOT NULL,"
 		+ "email VARCHAR(50) UNIQUE NOT NULL,"
-		+ "password VARCHAR(50) NOT NULL,"
-		+ "fullname VARCHAR(80),"
+		+ "password VARCHAR(256) NOT NULL,"
+		+ "first_name VARCHAR(50),"
+		+ "last_name VARCHAR(50),"
 		+ "age INT,"
-		+ "location VARCHAR(200),"
 		+ "PRIMARY KEY (id)"
 		+ ")"; 
 		createTable("user", sql);
@@ -142,7 +145,7 @@ public class Database
 		}
 	}
 	
-	public void addUser(User user) throws AlreadyExistsException
+	public void registerUser(RegisterPacket user) throws ErrorException
 	{
 		String sql;
 		
@@ -157,7 +160,7 @@ public class Database
 			ResultSet rs = statement.executeQuery(sql);
 			rs.last();
 			if (rs.getRow() > 0)
-				throw new AlreadyExistsException(String.format("Email %s already exists.", user.email));
+				throw new ErrorException(String.format("Email %s already exists.", user.email));
 		} catch (SQLException e) {e.printStackTrace();}
 		
 		//Check if username already exists
@@ -171,14 +174,15 @@ public class Database
 			ResultSet rs = statement.executeQuery(sql);
 			rs.last();
 			if (rs.getRow() > 0)
-				throw new AlreadyExistsException(String.format("Username %s already exists.", user.username));
+				throw new ErrorException(String.format("Username %s already exists.", user.username));
 		} catch (SQLException e) {e.printStackTrace();}
 		
+		//Add user to database
 		sql =
 		String.format(
-		  "INSERT INTO user(username, email, password, fullname, location, age)"
+		  "INSERT INTO user(username, email, password, first_name, last_name, age)"
 		+ "VALUES('%s', '%s', '%s', '%s', '%s', %d);",
-		user.username, user.email, user.password, user.fullname, user.location, user.age);
+		user.username, user.email, user.password, user.firstName, user.lastName, user.age);
 		try
 		{
 			statement.execute(sql);
@@ -186,5 +190,52 @@ public class Database
 		{
 			System.out.println(e.getMessage());
 		}
+	}
+	
+	public void loginUser(LoginPacket user) throws ErrorException
+	{
+		String sql;
+		
+		sql = 
+		String.format(
+		  "SELECT * FROM user "
+		+ "WHERE ((email = '%s' OR username = '%s') AND password = '%s');",
+		user.usernameEmail, user.usernameEmail, user.password);
+		try 
+		{
+			ResultSet rs = statement.executeQuery(sql);
+			rs.last();
+			if (rs.getRow() > 0)
+				return;
+			
+		} catch (SQLException e) {e.printStackTrace();}
+		
+		throw new ErrorException("Username or password are incorrect.");
+	}
+	
+	public ReceiveUserPacket getUser(String usernameEmail)
+	{
+		ReceiveUserPacket user = new ReceiveUserPacket();
+		
+		String sql = 
+		String.format(
+		  "SELECT * FROM user "
+		+ "WHERE (email = '%s' OR username = '%s');",
+		usernameEmail, usernameEmail);
+		
+		ResultSet rs;
+		try 
+		{
+			rs = statement.executeQuery(sql);
+			rs.first();
+			user.id = rs.getInt("id");
+			user.username = rs.getString("username");
+			user.email = rs.getString("email");
+			user.firstName = rs.getString("first_name");
+			user.lastName = rs.getString("last_name");
+			user.age = rs.getInt("age");
+		} catch (SQLException e) {e.printStackTrace();}
+		
+		return user;
 	}
 }

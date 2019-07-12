@@ -2,7 +2,7 @@ package Packets;
 
 import Config.MessageType;
 
-public class SystemMessage
+public class SystemMessagePacket
 {
     public MessageType type;
     public String message;

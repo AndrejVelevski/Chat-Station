@@ -1,12 +1,11 @@
 package Packets;
 
-public class User
+public class ReceiveUserPacket
 {
     public int id;
     public String email;
     public String username;
-    public String password;
-    public String fullname;
+    public String firstName;
+    public String lastName;
     public Integer age;
-    public String location;
 }

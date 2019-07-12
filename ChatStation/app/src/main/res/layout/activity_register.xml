@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activities.Register">
+    tools:context=".Activities.RegisterActivity">
 
     <EditText
         android:id="@+id/etRegisterUsername"
@@ -20,7 +20,7 @@
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="@+id/glRegisterGuideline1"
         app:layout_constraintTop_toBottomOf="@+id/etRegisterEmail" />
 
     <EditText
@@ -36,18 +36,18 @@
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="@+id/glRegisterGuideline1"
         app:layout_constraintTop_toBottomOf="@+id/etRegisterUsername" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline"
+        android:id="@+id/glRegisterGuideline1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
         app:layout_constraintGuide_begin="150dp" />
 
     <TextView
-        android:id="@+id/tvEmail"
+        android:id="@+id/tvRegisterEmail"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -56,13 +56,13 @@
         android:layout_marginRight="8dp"
         android:text="Email*"
         app:layout_constraintBottom_toBottomOf="@+id/etRegisterEmail"
-        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintEnd_toStartOf="@+id/glRegisterGuideline1"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/etRegisterEmail" />
 
     <TextView
-        android:id="@+id/tvUsername"
+        android:id="@+id/tvRegisterUsername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -71,13 +71,13 @@
         android:layout_marginRight="8dp"
         android:text="Username*"
         app:layout_constraintBottom_toBottomOf="@+id/etRegisterUsername"
-        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintEnd_toStartOf="@+id/glRegisterGuideline1"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/etRegisterUsername" />
 
     <TextView
-        android:id="@+id/tvPassword"
+        android:id="@+id/tvRegisterPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -86,7 +86,7 @@
         android:layout_marginRight="8dp"
         android:text="Password*"
         app:layout_constraintBottom_toBottomOf="@+id/etRegisterPassword"
-        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintEnd_toStartOf="@+id/glRegisterGuideline1"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/etRegisterPassword" />
@@ -104,8 +104,8 @@
         android:hint="example@domain.com"
         android:inputType="textEmailAddress"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toTopOf="@+id/guideline2" />
+        app:layout_constraintStart_toStartOf="@+id/glRegisterGuideline1"
+        app:layout_constraintTop_toTopOf="@+id/glRegisterGuideline2" />
 
     <EditText
         android:id="@+id/etRegisterConfirmPassword"
@@ -120,11 +120,11 @@
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="@+id/glRegisterGuideline1"
         app:layout_constraintTop_toBottomOf="@+id/etRegisterPassword" />
 
     <TextView
-        android:id="@+id/tvConfirmPassword"
+        android:id="@+id/tvRegisterConfirmPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -134,7 +134,7 @@
         android:gravity="right"
         android:text="Confirm Password*"
         app:layout_constraintBottom_toBottomOf="@+id/etRegisterConfirmPassword"
-        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintEnd_toStartOf="@+id/glRegisterGuideline1"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/etRegisterConfirmPassword" />
@@ -153,11 +153,11 @@
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="@+id/glRegisterGuideline1"
         app:layout_constraintTop_toBottomOf="@+id/etRegisterConfirmPassword" />
 
     <TextView
-        android:id="@+id/tvFirstName"
+        android:id="@+id/tvRegisterFirstName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -166,7 +166,7 @@
         android:layout_marginRight="8dp"
         android:text="First name"
         app:layout_constraintBottom_toBottomOf="@+id/etRegisterFirstName"
-        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintEnd_toStartOf="@+id/glRegisterGuideline1"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/etRegisterFirstName" />
@@ -185,11 +185,11 @@
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="@+id/glRegisterGuideline1"
         app:layout_constraintTop_toBottomOf="@+id/etRegisterFirstName" />
 
     <TextView
-        android:id="@+id/tvLastName"
+        android:id="@+id/tvRegisterLastName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -198,7 +198,7 @@
         android:layout_marginRight="8dp"
         android:text="Last name"
         app:layout_constraintBottom_toBottomOf="@+id/etRegisterLastName"
-        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintEnd_toStartOf="@+id/glRegisterGuideline1"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/etRegisterLastName" />
@@ -216,11 +216,11 @@
         android:inputType="numberSigned"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="@+id/glRegisterGuideline1"
         app:layout_constraintTop_toBottomOf="@+id/etRegisterLastName" />
 
     <TextView
-        android:id="@+id/tvAge"
+        android:id="@+id/tvRegisterAge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -229,20 +229,20 @@
         android:layout_marginRight="8dp"
         android:text="Age"
         app:layout_constraintBottom_toBottomOf="@+id/etRegisterAge"
-        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintEnd_toStartOf="@+id/glRegisterGuideline1"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/etRegisterAge" />
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/guideline2"
+        android:id="@+id/glRegisterGuideline2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         app:layout_constraintGuide_begin="50dp" />
 
     <TextView
-        android:id="@+id/tvInfo"
+        android:id="@+id/tvRegisterInfo"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
@@ -253,13 +253,13 @@
         android:layout_marginBottom="8dp"
         android:gravity="bottom|right"
         android:text="Fields marked with * are required"
-        app:layout_constraintBottom_toTopOf="@+id/guideline2"
-        app:layout_constraintEnd_toStartOf="@+id/guideline"
+        app:layout_constraintBottom_toTopOf="@+id/glRegisterGuideline2"
+        app:layout_constraintEnd_toStartOf="@+id/glRegisterGuideline1"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/tvErrorMessage"
+        android:id="@+id/tvRegisterErrorMessage"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="8dp"
@@ -270,9 +270,9 @@
         android:layout_marginBottom="8dp"
         android:gravity="bottom"
         android:textColor="#FF0000"
-        app:layout_constraintBottom_toTopOf="@+id/guideline2"
+        app:layout_constraintBottom_toTopOf="@+id/glRegisterGuideline2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline"
+        app:layout_constraintStart_toStartOf="@+id/glRegisterGuideline1"
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button

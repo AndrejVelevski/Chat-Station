@@ -11,11 +11,16 @@ import android.widget.Toast;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
+import com.esotericsoftware.kryonet.Connection;
+import com.esotericsoftware.kryonet.Listener;
 import com.mpip.chatstation.Config.Constants;
 import com.mpip.chatstation.Networking.ConnectToServerThread;
 import com.mpip.chatstation.Config.MessageType;
-import com.mpip.chatstation.Packets.SystemMessage;
-import com.mpip.chatstation.Packets.User;
+import com.mpip.chatstation.Packets.LoginPacket;
+import com.mpip.chatstation.Packets.ReceiveUserPacket;
+import com.mpip.chatstation.Packets.RequestUserPacket;
+import com.mpip.chatstation.Packets.SystemMessagePacket;
+import com.mpip.chatstation.Packets.RegisterPacket;
 import com.mpip.chatstation.R;
 
 public class MainActivity extends AppCompatActivity
@@ -24,6 +29,9 @@ public class MainActivity extends AppCompatActivity
     Button btnLogin;
     Button btnReconnect;
 
+    Listener listener;
+
+    Intent backToMainIntent;
     public static Client client;
 
     @Override
@@ -39,39 +47,66 @@ public class MainActivity extends AppCompatActivity
         btnReconnect = findViewById(R.id.btnMainReconnect);
         btnReconnect.setVisibility(View.GONE);
 
-        client = new Client();
-        Kryo kryo = client.getKryo();
-        kryo.register(MessageType.class);
-        kryo.register(SystemMessage.class);
-        kryo.register(User.class);
-        client.start();
+        backToMainIntent = new Intent(this, MainActivity.class);
 
-        connectToServer();
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent intent)
-    {
-        switch (requestCode)
+        if (client == null)
         {
-            case Constants.REGISTER:
-                if (resultCode == Activity.RESULT_OK)
+            client = new Client();
+            Kryo kryo = client.getKryo();
+            kryo.register(MessageType.class);
+            kryo.register(SystemMessagePacket.class);
+            kryo.register(RegisterPacket.class);
+            kryo.register(LoginPacket.class);
+            kryo.register(RequestUserPacket.class);
+            kryo.register(ReceiveUserPacket.class);
+            client.start();
+        }
+
+        listener = new Listener()
+        {
+            public void received(Connection connection, Object object)
+            {
+                if (object instanceof SystemMessagePacket)
                 {
-                    Toast.makeText(this,intent.getStringExtra("message"),Toast.LENGTH_LONG).show();
+                    SystemMessagePacket systemMessage = (SystemMessagePacket)object;
+
+                    switch (systemMessage.type)
+                    {
+                        case SERVER_CLOSED:
+                            backToMainIntent.putExtra("message", systemMessage.message);
+                            startActivity(backToMainIntent);
+                            break;
+                    }
                 }
-                break;
+            }
+        };
+
+        client.addListener(listener);
+
+        Bundle extras = getIntent().getExtras();
+        if(extras != null)
+        {
+            Toast.makeText(this,extras.getString("message"),Toast.LENGTH_LONG).show();
+            btnRegister.setEnabled(false);
+            btnLogin.setEnabled(false);
+            btnReconnect.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            connectToServer();
         }
     }
 
     public void registerMain(View view)
     {
         Intent intent = new Intent(this, RegisterActivity.class);
-        startActivityForResult(intent, Constants.REGISTER);
+        startActivity(intent);
     }
 
     public void loginMain(View view)
     {
-
+        Intent intent = new Intent(this, LoginActivity.class);
+        startActivity(intent);
     }
 
     public void reconnect(View view)
@@ -83,7 +118,7 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            ConnectToServerThread thread = new ConnectToServerThread(client, "78.157.30.115", 54555, 1000);
+            ConnectToServerThread thread = new ConnectToServerThread(client, "78.157.30.124", 54555, 1000);
             thread.start();
             try
             {
