@@ -14,7 +14,7 @@ import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Server;
 
-import Packets.MessageType;
+import Config.MessageType;
 import Packets.SystemMessage;
 import Packets.User;
 
@@ -54,6 +54,7 @@ public class Main
 						systemMessage.type = MessageType.REGISTER_SUCCESS;
 	        			systemMessage.message = "Registered successfully.";
 	        			connection.sendTCP(systemMessage);
+	        			System.out.println(String.format("Created user '%s'...", user.username));
 					}
 	        		catch (AlreadyExistsException e)
 	        		{

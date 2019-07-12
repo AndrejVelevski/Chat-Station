@@ -1,4 +1,4 @@
-package Packets;
+package Config;
 
 public enum MessageType
 {

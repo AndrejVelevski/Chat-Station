@@ -4,6 +4,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+import Config.ConfigConstants;
 import Packets.User;
 
 public class Database

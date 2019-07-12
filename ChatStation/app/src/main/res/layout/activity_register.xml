@@ -7,7 +7,7 @@
     tools:context=".Activities.Register">
 
     <EditText
-        android:id="@+id/etUsername"
+        android:id="@+id/etRegisterUsername"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -21,10 +21,10 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/etEmail" />
+        app:layout_constraintTop_toBottomOf="@+id/etRegisterEmail" />
 
     <EditText
-        android:id="@+id/etPassword"
+        android:id="@+id/etRegisterPassword"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -37,7 +37,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/etUsername" />
+        app:layout_constraintTop_toBottomOf="@+id/etRegisterUsername" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline"
@@ -55,11 +55,11 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:text="Email*"
-        app:layout_constraintBottom_toBottomOf="@+id/etEmail"
+        app:layout_constraintBottom_toBottomOf="@+id/etRegisterEmail"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/etEmail" />
+        app:layout_constraintTop_toTopOf="@+id/etRegisterEmail" />
 
     <TextView
         android:id="@+id/tvUsername"
@@ -70,11 +70,11 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:text="Username*"
-        app:layout_constraintBottom_toBottomOf="@+id/etUsername"
+        app:layout_constraintBottom_toBottomOf="@+id/etRegisterUsername"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/etUsername" />
+        app:layout_constraintTop_toTopOf="@+id/etRegisterUsername" />
 
     <TextView
         android:id="@+id/tvPassword"
@@ -85,14 +85,14 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:text="Password*"
-        app:layout_constraintBottom_toBottomOf="@+id/etPassword"
+        app:layout_constraintBottom_toBottomOf="@+id/etRegisterPassword"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/etPassword" />
+        app:layout_constraintTop_toTopOf="@+id/etRegisterPassword" />
 
     <EditText
-        android:id="@+id/etEmail"
+        android:id="@+id/etRegisterEmail"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -108,7 +108,7 @@
         app:layout_constraintTop_toTopOf="@+id/guideline2" />
 
     <EditText
-        android:id="@+id/etConfirmPassword"
+        android:id="@+id/etRegisterConfirmPassword"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -121,7 +121,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/etPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/etRegisterPassword" />
 
     <TextView
         android:id="@+id/tvConfirmPassword"
@@ -133,14 +133,14 @@
         android:layout_marginRight="8dp"
         android:gravity="right"
         android:text="Confirm Password*"
-        app:layout_constraintBottom_toBottomOf="@+id/etConfirmPassword"
+        app:layout_constraintBottom_toBottomOf="@+id/etRegisterConfirmPassword"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/etConfirmPassword" />
+        app:layout_constraintTop_toTopOf="@+id/etRegisterConfirmPassword" />
 
     <EditText
-        android:id="@+id/etFirstName"
+        android:id="@+id/etRegisterFirstName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -154,7 +154,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/etConfirmPassword" />
+        app:layout_constraintTop_toBottomOf="@+id/etRegisterConfirmPassword" />
 
     <TextView
         android:id="@+id/tvFirstName"
@@ -165,14 +165,14 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:text="First name"
-        app:layout_constraintBottom_toBottomOf="@+id/etFirstName"
+        app:layout_constraintBottom_toBottomOf="@+id/etRegisterFirstName"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/etFirstName" />
+        app:layout_constraintTop_toTopOf="@+id/etRegisterFirstName" />
 
     <EditText
-        android:id="@+id/etLastName"
+        android:id="@+id/etRegisterLastName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -186,7 +186,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/etFirstName" />
+        app:layout_constraintTop_toBottomOf="@+id/etRegisterFirstName" />
 
     <TextView
         android:id="@+id/tvLastName"
@@ -197,14 +197,14 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:text="Last name"
-        app:layout_constraintBottom_toBottomOf="@+id/etLastName"
+        app:layout_constraintBottom_toBottomOf="@+id/etRegisterLastName"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/etLastName" />
+        app:layout_constraintTop_toTopOf="@+id/etRegisterLastName" />
 
     <EditText
-        android:id="@+id/etAge"
+        android:id="@+id/etRegisterAge"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -217,7 +217,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/guideline"
-        app:layout_constraintTop_toBottomOf="@+id/etLastName" />
+        app:layout_constraintTop_toBottomOf="@+id/etRegisterLastName" />
 
     <TextView
         android:id="@+id/tvAge"
@@ -228,11 +228,11 @@
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:text="Age"
-        app:layout_constraintBottom_toBottomOf="@+id/etAge"
+        app:layout_constraintBottom_toBottomOf="@+id/etRegisterAge"
         app:layout_constraintEnd_toStartOf="@+id/guideline"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/etAge" />
+        app:layout_constraintTop_toTopOf="@+id/etRegisterAge" />
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/guideline2"
@@ -276,7 +276,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/btnRegister"
+        android:id="@+id/btnRegisterRegister"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"

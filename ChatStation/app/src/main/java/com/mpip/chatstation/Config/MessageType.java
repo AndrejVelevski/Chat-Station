@@ -1,4 +1,4 @@
-package com.mpip.chatstation.Packets;
+package com.mpip.chatstation.Config;
 
 public enum MessageType
 {
