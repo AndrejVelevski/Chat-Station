@@ -7,7 +7,7 @@
     tools:context=".Activities.MainActivity">
 
     <Button
-        android:id="@+id/btnLogInMain"
+        android:id="@+id/btnMainLogin"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -19,15 +19,15 @@
         android:text="Log In"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnRegisterMain" />
+        app:layout_constraintTop_toBottomOf="@+id/btnMainRegister" />
 
     <Button
-        android:id="@+id/btnRegisterMain"
+        android:id="@+id/btnMainRegister"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginLeft="8dp"
-        android:layout_marginTop="216dp"
+        android:layout_marginTop="200dp"
         android:layout_marginEnd="8dp"
         android:layout_marginRight="8dp"
         android:onClick="registerMain"
@@ -38,7 +38,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/btnReconnect"
+        android:id="@+id/btnMainReconnect"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
@@ -51,6 +51,6 @@
         android:visibility="visible"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnLogInMain" />
+        app:layout_constraintTop_toBottomOf="@+id/btnMainLogin" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

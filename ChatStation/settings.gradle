@@ -1,1 +1,1 @@
-include ':app', ':kryonet-2.21-all', ':mysql-connector-java-8.0.16'
+include ':app', ':kryonet-2.21-all', ':mysql-connector-java-8.0.16', ':jbcrypt-0.4'

@@ -2,21 +2,21 @@ package com.mpip.chatstation.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Activity;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
+import com.mpip.chatstation.Config.Constants;
 import com.mpip.chatstation.Networking.SendPacketThread;
-import com.mpip.chatstation.Packets.SystemMessage;
-import com.mpip.chatstation.Packets.User;
+import com.mpip.chatstation.Packets.SystemMessagePacket;
+import com.mpip.chatstation.Packets.RegisterPacket;
 import com.mpip.chatstation.R;
+
+import org.mindrot.jbcrypt.BCrypt;
 
 public class RegisterActivity extends AppCompatActivity
 {
@@ -32,42 +32,45 @@ public class RegisterActivity extends AppCompatActivity
 
     Listener listener;
 
+    Intent goToHomeActivity;
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        etEmail = findViewById(R.id.etEmail);
-        etUsername = findViewById(R.id.etUsername);
-        etPassword = findViewById(R.id.etPassword);
-        etConfirmPassword = findViewById(R.id.etConfirmPassword);
-        etFirstName = findViewById(R.id.etFirstName);
-        etLastName = findViewById(R.id.etLastName);
-        etAge = findViewById(R.id.etAge);
+        etEmail = findViewById(R.id.etRegisterEmail);
+        etUsername = findViewById(R.id.etRegisterUsername);
+        etPassword = findViewById(R.id.etRegisterPassword);
+        etConfirmPassword = findViewById(R.id.etRegisterConfirmPassword);
+        etFirstName = findViewById(R.id.etRegisterFirstName);
+        etLastName = findViewById(R.id.etRegisterLastName);
+        etAge = findViewById(R.id.etRegisterAge);
 
-        tvErrorMessage = findViewById(R.id.tvErrorMessage);
+        tvErrorMessage = findViewById(R.id.tvRegisterErrorMessage);
+
+        goToHomeActivity = new Intent(this, HomeActivity.class);
 
         listener = new Listener()
         {
             public void received(Connection connection, Object object)
             {
-                if (object instanceof SystemMessage)
+                if (object instanceof SystemMessagePacket)
                 {
-                    SystemMessage systemMessage = (SystemMessage)object;
+                    SystemMessagePacket systemMessage = (SystemMessagePacket)object;
 
                     switch (systemMessage.type)
                     {
                         case REGISTER_SUCCESS:
                             MainActivity.client.removeListener(listener);
 
-                            Intent intent = new Intent();
-                            intent.putExtra("message", systemMessage.message);
-                            setResult(Activity.RESULT_OK, intent);
-                            finish();
+                            goToHomeActivity.putExtra("usernameEmail", etUsername.getText().toString());
+                            startActivity(goToHomeActivity);
+
                             break;
 
-                        case ERROR:
+                        case REGISTER_FAILED:
                             tvErrorMessage.setText(systemMessage.message);
                             break;
                     }
@@ -80,15 +83,14 @@ public class RegisterActivity extends AppCompatActivity
 
     public void register(View view)
     {
-        User user = new User();
-        user.id = -1;
+        RegisterPacket user = new RegisterPacket();
         user.email = etEmail.getText().toString();
         user.username = etUsername.getText().toString();
-        user.password = etPassword.getText().toString();
-        user.fullname = String.format("%s %s", etFirstName.getText().toString(), etLastName.getText().toString());
+        user.password = BCrypt.hashpw(etPassword.getText().toString(), Constants.SALT);
+        user.firstName = etFirstName.getText().toString();
+        user.lastName = etLastName.getText().toString();
         if (etAge.getText().toString().length() > 0)
             user.age = Integer.valueOf(etAge.getText().toString());
-        user.location = null;
 
         boolean error = false;
         if (user.email.trim().length() == 0)

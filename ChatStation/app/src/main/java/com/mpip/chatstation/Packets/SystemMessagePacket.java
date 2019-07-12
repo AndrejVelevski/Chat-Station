@@ -1,6 +1,8 @@
 package com.mpip.chatstation.Packets;
 
-public class SystemMessage
+import com.mpip.chatstation.Config.MessageType;
+
+public class SystemMessagePacket
 {
     public MessageType type;
     public String message;
