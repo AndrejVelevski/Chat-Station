@@ -44,7 +44,7 @@ public class HomeActivity extends AppCompatActivity
             {
                 if (object instanceof ReceiveUserPacket)
                 {
-                    ReceiveUserPacket user = (ReceiveUserPacket)object;0
+                    ReceiveUserPacket user = (ReceiveUserPacket)object;
 
                     String txt = String.format(
                                     "Welcome %s.\n" +
