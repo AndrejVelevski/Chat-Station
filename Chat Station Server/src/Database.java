@@ -4,16 +4,11 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-<<<<<<< HEAD
-import Packets.User;
-import org.mindrot.jbcrypt.BCrypt;
-=======
 import Config.ConfigConstants;
 import Packets.LoginPacket;
 import Packets.ReceiveUserPacket;
 import Packets.RegisterPacket;
 import Packets.RequestUserPacket;
->>>>>>> login
 
 public class Database
 {
@@ -81,14 +76,9 @@ public class Database
 		+ "id INT AUTO_INCREMENT,"
 		+ "username VARCHAR(50) UNIQUE NOT NULL,"
 		+ "email VARCHAR(50) UNIQUE NOT NULL,"
-<<<<<<< HEAD
-		+ "password VARCHAR(200) NOT NULL,"
-		+ "fullname VARCHAR(80),"
-=======
 		+ "password VARCHAR(256) NOT NULL,"
 		+ "first_name VARCHAR(50),"
 		+ "last_name VARCHAR(50),"
->>>>>>> login
 		+ "age INT,"
 		+ "PRIMARY KEY (id)"
 		+ ")"; 
@@ -182,38 +172,17 @@ public class Database
 		try 
 		{
 			ResultSet rs = statement.executeQuery(sql);
-
 			rs.last();
 			if (rs.getRow() > 0)
 				throw new ErrorException(String.format("Username %s already exists.", user.username));
 		} catch (SQLException e) {e.printStackTrace();}
-<<<<<<< HEAD
-
-		// Hash the password
-		String hashedPassword = BCrypt.hashpw(user.password, BCrypt.gensalt());
-
-		//Za logiranje
-		//Check that an unencrypted password matches one that has
-		//previously been hashed
-		//if (BCrypt.checkpw(password, hashedPassword))
-		//	System.out.println("It matches");
-		//else
-		//	System.out.println("It does not match");
-
-=======
 		
 		//Add user to database
->>>>>>> login
 		sql =
 		String.format(
 		  "INSERT INTO user(username, email, password, first_name, last_name, age)"
 		+ "VALUES('%s', '%s', '%s', '%s', '%s', %d);",
-<<<<<<< HEAD
-		user.username, user.email, hashedPassword, user.fullname, user.location, user.age);
-
-=======
 		user.username, user.email, user.password, user.firstName, user.lastName, user.age);
->>>>>>> login
 		try
 		{
 			statement.execute(sql);

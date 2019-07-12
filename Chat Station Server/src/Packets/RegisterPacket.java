@@ -8,9 +8,4 @@ public class RegisterPacket
     public String firstName;
     public String lastName;
     public Integer age;
-<<<<<<< HEAD:Chat Station Server/src/Packets/User.java
-    public String location;
-
-=======
->>>>>>> login:Chat Station Server/src/Packets/RegisterPacket.java
 }
