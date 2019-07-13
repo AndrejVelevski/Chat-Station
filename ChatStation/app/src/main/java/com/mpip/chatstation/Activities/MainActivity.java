@@ -145,4 +145,9 @@ public class MainActivity extends AppCompatActivity
             e.printStackTrace();
         }
     }
+
+    public void testButtonClick(View view){
+        Intent intent = new Intent(this, NavUiMainActivity.class);
+        startActivityForResult(intent, 0);
+    }
 }
