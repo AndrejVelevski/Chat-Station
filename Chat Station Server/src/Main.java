@@ -2,19 +2,20 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.Scanner;
 
-import org.mindrot.jbcrypt.BCrypt;
-
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Server;
 
-import Config.MessageType;
+import Config.SystemMessagePacketType;
+import Config.UserPacketType;
+import Exceptions.AccountNotConfirmedException;
+import Exceptions.EmailAlreadyExistsException;
+import Exceptions.IncorrectConfirmationCodeException;
+import Exceptions.IncorrectUsernameOrPasswordException;
+import Exceptions.UsernameAlreadyExistsException;
 import Packets.SystemMessagePacket;
-import Packets.LoginPacket;
-import Packets.ReceiveUserPacket;
-import Packets.RegisterPacket;
-import Packets.RequestUserPacket;
+import Packets.UserPacket;
 
 public class Main
 {
@@ -24,12 +25,10 @@ public class Main
 	    server.bind(54555);
 	    
 	    Kryo kryo = server.getKryo();
-	    kryo.register(MessageType.class);
-	    kryo.register(SystemMessagePacket.class);
-	    kryo.register(RegisterPacket.class);
-	    kryo.register(LoginPacket.class);
-	    kryo.register(RequestUserPacket.class);
-	    kryo.register(ReceiveUserPacket.class);
+	    kryo.register(SystemMessagePacketType.class);
+        kryo.register(SystemMessagePacket.class);
+        kryo.register(UserPacketType.class);
+        kryo.register(UserPacket.class);
 	    
 	    Database db = new Database("chatstation");
 	    
@@ -41,47 +40,91 @@ public class Main
 	    {
 	        public void received (Connection connection, Object object)
 	        {
-	        	if (object instanceof RegisterPacket)
+	        	if (object instanceof UserPacket)
 	        	{
-	        		RegisterPacket user = (RegisterPacket)object;
-	        		try
+	        		UserPacket user = (UserPacket)object;
+	        		
+	        		switch (user.type)
 	        		{
-						db.registerUser(user);
-						systemMessage.type = MessageType.REGISTER_SUCCESS;
-	        			systemMessage.message = "Registered successfully.";
-	        			connection.sendTCP(systemMessage);
-	        			System.out.println(String.format("Registered user '%s %s'...", user.email, user.username));
-					}
-	        		catch (ErrorException e)
-	        		{
-	        			systemMessage.type = MessageType.REGISTER_FAILED;
-	        			systemMessage.message = e.getMessage();
-	        			connection.sendTCP(systemMessage);
-					}
-	        	}
-	        	else if (object instanceof LoginPacket)
-	        	{
-	        		LoginPacket user = (LoginPacket)object;
-	        		try
-	        		{
-						db.loginUser(user);
-						systemMessage.type = MessageType.LOGIN_SUCCESS;
-	        			systemMessage.message = "Logged in successfully.";
-	        			connection.sendTCP(systemMessage);
-	        			System.out.println(String.format("Logged in user '%s'...", user.usernameEmail));
-					}
-	        		catch (ErrorException e)
-	        		{
-	        			systemMessage.type = MessageType.LOGIN_FAILED;
-	        			systemMessage.message = e.getMessage();
-	        			connection.sendTCP(systemMessage);
-					}
-	        	}
-	        	else if (object instanceof RequestUserPacket)
-	        	{
-	        		RequestUserPacket requestUser = (RequestUserPacket)object;
-	        		ReceiveUserPacket receiveUser = db.getUser(requestUser.usernameEmail);
-	        		connection.sendTCP(receiveUser);
+	        			case REGISTER_USER:
+	        			{
+	        				try
+	    	        		{
+	    	        			db.registerUser(user);
+	    						systemMessage.type = SystemMessagePacketType.REGISTER_SUCCESS;
+	    	        			systemMessage.message = "Registered successfully.";
+	    	        			connection.sendTCP(systemMessage);
+	    	        			System.out.println(String.format("Registered user '%s'...", user.email));
+	    					}
+	    	        		catch (EmailAlreadyExistsException | UsernameAlreadyExistsException e)
+	    	        		{
+	    	        			systemMessage.type = SystemMessagePacketType.REGISTER_FAILED;
+	    	        			systemMessage.message = e.getMessage();
+	    	        			connection.sendTCP(systemMessage);
+	    					}
+	        				break;
+	        			}
+	        				
+	        			case LOGIN_USER:
+	        			{
+	        				try
+	    	        		{
+	    						db.loginUser(user);
+	    						systemMessage.type = SystemMessagePacketType.LOGIN_SUCCESS;
+	    	        			systemMessage.message = "Logged in successfully.";
+	    	        			connection.sendTCP(systemMessage);
+	    	        			System.out.println(String.format("Logged in user '%s'...", user.email));
+	    					}
+	    	        		catch (IncorrectUsernameOrPasswordException e)
+	    	        		{
+	    	        			systemMessage.type = SystemMessagePacketType.LOGIN_FAILED;
+	    	        			systemMessage.message = e.getMessage();
+	    	        			connection.sendTCP(systemMessage);
+	    					}
+	        				catch (AccountNotConfirmedException e)
+	        				{
+	        					systemMessage.type = SystemMessagePacketType.ACCOUNT_NOT_CONFIRMED;
+	    	        			systemMessage.message = e.getMessage();
+	    	        			connection.sendTCP(systemMessage);
+							}
+	        				break;
+	        			}
+	        				
+	        			case REQUEST_USER:
+	        			{
+	        				UserPacket receiveUser = db.getUser(user.email);
+	        				receiveUser.type = UserPacketType.RECEIVE_USER;
+    						connection.sendTCP(receiveUser);
+	    					break;
+	        			}
+	    					
+	        			case RESEND_CODE:
+		        		{
+		        			UserPacket receiveUser = db.getUser(user.email);
+		        			db.sendConfirmationCode(receiveUser.email, receiveUser.username);
+		        			break;
+		        		}
+	        				
+						case CONFIRM_CODE:
+						{
+							try
+							{
+								db.confirmAccount(user.email, user.confirm_code.toUpperCase());
+								systemMessage.type = SystemMessagePacketType.CONFIRMATION_CODE_SUCCESS;
+	    	        			systemMessage.message = "Account confirmed successfully.";
+	    	        			connection.sendTCP(systemMessage);
+							}
+							catch (IncorrectConfirmationCodeException e)
+							{
+								systemMessage.type = SystemMessagePacketType.CONFIRMATION_CODE_FAILED;
+	    	        			systemMessage.message = e.getMessage();
+	    	        			connection.sendTCP(systemMessage);
+							}
+							break;
+						}
+						default:
+							break;
+	        		}
 	        	}
 	        }
 	     });
@@ -98,7 +141,7 @@ public class Main
 	    	{
 		    	case "/stop":
 		    	{
-		    		systemMessage.type = MessageType.SERVER_CLOSED;
+		    		systemMessage.type = SystemMessagePacketType.SERVER_CLOSED;
 		    		systemMessage.message = "Server closed.";
 		    		Arrays.stream(server.getConnections()).forEach(c -> c.sendTCP(systemMessage));
 		    		

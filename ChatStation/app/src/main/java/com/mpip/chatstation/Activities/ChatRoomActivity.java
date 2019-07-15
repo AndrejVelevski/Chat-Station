@@ -56,7 +56,7 @@ public class ChatRoomActivity extends AppCompatActivity
 
         mp = new MessagePacket();
 
-        MainActivity.client.addListener(new Listener()
+        MainActivity.client.addListener(new KryoListener()
         {
             public void received(Connection connection, Object object)
             {

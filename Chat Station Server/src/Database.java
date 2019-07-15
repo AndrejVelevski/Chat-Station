@@ -3,12 +3,17 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDateTime;
+import java.util.Random;
+import java.util.stream.Collectors;
 
 import Config.ConfigConstants;
-import Packets.LoginPacket;
-import Packets.ReceiveUserPacket;
-import Packets.RegisterPacket;
-import Packets.RequestUserPacket;
+import Exceptions.AccountNotConfirmedException;
+import Exceptions.EmailAlreadyExistsException;
+import Exceptions.IncorrectConfirmationCodeException;
+import Exceptions.IncorrectUsernameOrPasswordException;
+import Exceptions.UsernameAlreadyExistsException;
+import Packets.UserPacket;
 
 public class Database
 {
@@ -45,6 +50,7 @@ public class Database
 		{
 			System.out.println(String.format("Connecting to database '%s'...", url));
 			connection = DriverManager.getConnection(String.format("%s%s", url, parametars), user, password);
+			System.out.println("Connected");
 
 		    System.out.println(String.format("Creating database '%s'...", name));
 		    statement = connection.createStatement();
@@ -74,12 +80,16 @@ public class Database
 		  "CREATE TABLE user"
 		+ "("
 		+ "id INT AUTO_INCREMENT,"
-		+ "username VARCHAR(50) UNIQUE NOT NULL,"
 		+ "email VARCHAR(50) UNIQUE NOT NULL,"
+		+ "username VARCHAR(50) UNIQUE NOT NULL,"
 		+ "password VARCHAR(256) NOT NULL,"
 		+ "first_name VARCHAR(50),"
 		+ "last_name VARCHAR(50),"
 		+ "age INT,"
+		+ "confirmed BOOL NOT NULL,"
+		+ "confirm_code VARCHAR(8),"
+		+ "registered_on DATETIME,"
+		+ "last_login DATETIME,"
 		+ "PRIMARY KEY (id)"
 		+ ")"; 
 		createTable("user", sql);
@@ -145,7 +155,7 @@ public class Database
 		}
 	}
 	
-	public void registerUser(RegisterPacket user) throws ErrorException
+	public void registerUser(UserPacket user) throws EmailAlreadyExistsException, UsernameAlreadyExistsException
 	{
 		String sql;
 		
@@ -160,7 +170,7 @@ public class Database
 			ResultSet rs = statement.executeQuery(sql);
 			rs.last();
 			if (rs.getRow() > 0)
-				throw new ErrorException(String.format("Email %s already exists.", user.email));
+				throw new EmailAlreadyExistsException(String.format("Email %s already exists.", user.email));
 		} catch (SQLException e) {e.printStackTrace();}
 		
 		//Check if username already exists
@@ -174,48 +184,110 @@ public class Database
 			ResultSet rs = statement.executeQuery(sql);
 			rs.last();
 			if (rs.getRow() > 0)
-				throw new ErrorException(String.format("Username %s already exists.", user.username));
+				throw new UsernameAlreadyExistsException(String.format("Username %s already exists.", user.username));
 		} catch (SQLException e) {e.printStackTrace();}
 		
 		//Add user to database
 		sql =
 		String.format(
-		  "INSERT INTO user(username, email, password, first_name, last_name, age)"
-		+ "VALUES('%s', '%s', '%s', '%s', '%s', %d);",
-		user.username, user.email, user.password, user.firstName, user.lastName, user.age);
+		  "INSERT INTO user(username, email, password, first_name, last_name, age, confirmed, registered_on) "
+		+ "VALUES('%s', '%s', '%s', '%s', '%s', %d, %b, '%s');",
+		user.username, user.email, user.password, user.first_name, user.last_name, user.age, false, LocalDateTime.now());
 		try
 		{
 			statement.execute(sql);
-		} catch (SQLException e)
-		{
-			System.out.println(e.getMessage());
-		}
+			sendConfirmationCode(user.email, user.username);
+		} catch (SQLException e){e.printStackTrace();}
 	}
 	
-	public void loginUser(LoginPacket user) throws ErrorException
+	public void loginUser(UserPacket user) throws IncorrectUsernameOrPasswordException, AccountNotConfirmedException
 	{
 		String sql;
 		
 		sql = 
 		String.format(
 		  "SELECT * FROM user "
-		+ "WHERE ((email = '%s' OR username = '%s') AND password = '%s');",
-		user.usernameEmail, user.usernameEmail, user.password);
+		+ "WHERE (email = '%s' AND password = '%s');",
+		user.email, user.password);
 		try 
 		{
 			ResultSet rs = statement.executeQuery(sql);
 			rs.last();
 			if (rs.getRow() > 0)
+			{
+				if (!rs.getBoolean("confirmed"))
+				{
+					throw new AccountNotConfirmedException(String.format("Account %s is not confirmed.", user.username));
+				}
+				
+				sql = String.format(
+						  "UPDATE user "
+						+ "SET last_login = '%s' "
+						+ "WHERE email = '%s';",
+						LocalDateTime.now(), user.email);
+				
+				statement.execute(sql);
+						
 				return;
+			}
 			
 		} catch (SQLException e) {e.printStackTrace();}
 		
-		throw new ErrorException("Username or password are incorrect.");
+		throw new IncorrectUsernameOrPasswordException("Email or password are incorrect.");
 	}
 	
-	public ReceiveUserPacket getUser(String usernameEmail)
+	public void sendConfirmationCode(String email, String username)
 	{
-		ReceiveUserPacket user = new ReceiveUserPacket();
+		String code = generateConfirmationCode(8);
+		String sql = String.format(
+			  "UPDATE user "
+			+ "SET confirm_code = '%s' "
+			+ "WHERE username = '%s';",
+			code, username);
+		
+		try
+		{
+			statement.execute(sql);
+			Email.send(email, username, code);
+		} catch (SQLException e) {e.printStackTrace();}
+	}
+	
+	public void confirmAccount(String email, String code) throws IncorrectConfirmationCodeException
+	{
+		String sql;
+		
+		sql = 
+		String.format(
+		  "SELECT * FROM user "
+		+ "WHERE email = '%s';",
+		email);
+		
+		try 
+		{
+			ResultSet rs = statement.executeQuery(sql);
+			rs.first();
+			
+			if (rs.getString("confirm_code").equals(code))
+			{
+				sql = String.format(
+						  "UPDATE user "
+						+ "SET confirmed = %b "
+						+ "WHERE email = '%s';",
+						true, email);
+				
+				statement.execute(sql);
+			}
+			else
+			{
+				throw new IncorrectConfirmationCodeException("The confirmation code you enered is incorrect or expired.");
+			}
+			
+		} catch (SQLException e) {e.printStackTrace();}
+	}
+	
+	public UserPacket getUser(String usernameEmail)
+	{
+		UserPacket user = new UserPacket();
 		
 		String sql = 
 		String.format(
@@ -228,14 +300,23 @@ public class Database
 		{
 			rs = statement.executeQuery(sql);
 			rs.first();
+			
 			user.id = rs.getInt("id");
-			user.username = rs.getString("username");
 			user.email = rs.getString("email");
-			user.firstName = rs.getString("first_name");
-			user.lastName = rs.getString("last_name");
+			user.username = rs.getString("username");
+			user.first_name = rs.getString("first_name");
+			user.last_name = rs.getString("last_name");
 			user.age = rs.getInt("age");
+			user.registered_on = rs.getString("registered_on");
+			user.last_login = rs.getString("last_login");
 		} catch (SQLException e) {e.printStackTrace();}
 		
 		return user;
+	}
+	
+	private String generateConfirmationCode(int length)
+	{
+		return new Random().ints((int)'0',(int)'Z'+1).filter(i-> (i<=(int)'9' || i>=(int)'A'))
+                .mapToObj(i -> String.valueOf((char)i)).limit(length).collect(Collectors.joining());
 	}
 }

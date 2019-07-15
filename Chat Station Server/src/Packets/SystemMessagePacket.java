@@ -1,9 +1,9 @@
 package Packets;
 
-import Config.MessageType;
+import Config.SystemMessagePacketType;
 
 public class SystemMessagePacket
 {
-    public MessageType type;
+    public SystemMessagePacketType type;
     public String message;
 }

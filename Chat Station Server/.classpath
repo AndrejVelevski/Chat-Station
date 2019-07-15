@@ -9,5 +9,7 @@
 	<classpathentry kind="lib" path="libs/kryonet-2.21-all.jar"/>
 	<classpathentry kind="lib" path="libs/mysql-connector-java-8.0.16.jar"/>
 	<classpathentry kind="lib" path="libs/jbcrypt-0.4.jar"/>
+	<classpathentry kind="lib" path="libs/activation-1.1.1.jar"/>
+	<classpathentry kind="lib" path="libs/javax.mail.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

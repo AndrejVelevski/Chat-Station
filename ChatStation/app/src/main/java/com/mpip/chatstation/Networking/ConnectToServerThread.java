@@ -10,19 +10,19 @@ import java.io.IOException;
 
 public class ConnectToServerThread extends Thread
 {
-    Client client;
-    String ipAddress;
-    int port;
-    int waitForResponse;
+    private Client client;
+    private String ipAddress;
+    private int port;
+    private int timeout;
 
     public boolean connectionSuccessful;
 
-    public ConnectToServerThread(Client client, String ipAddress, int port, int waitForResponse)
+    public ConnectToServerThread(Client client, String ipAddress, int port, int timeout)
     {
         this.client = client;
         this.ipAddress = ipAddress;
         this.port = port;
-        this.waitForResponse = waitForResponse;
+        this.timeout = timeout;
     }
 
     @Override
@@ -30,12 +30,13 @@ public class ConnectToServerThread extends Thread
     {
         try
         {
-            client.connect(waitForResponse, ipAddress, port);
+            client.connect(timeout, ipAddress, port);
             connectionSuccessful = true;
         }
         catch (IOException e)
         {
             connectionSuccessful = false;
+            e.printStackTrace();
         }
     }
 }

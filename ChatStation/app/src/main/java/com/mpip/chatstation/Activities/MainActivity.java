@@ -2,7 +2,6 @@ package com.mpip.chatstation.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -11,27 +10,21 @@ import android.widget.Toast;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
-import com.esotericsoftware.kryonet.Connection;
-import com.esotericsoftware.kryonet.Listener;
 import com.mpip.chatstation.Config.Constants;
+import com.mpip.chatstation.Config.SystemMessagePacketType;
+import com.mpip.chatstation.Config.UserPacketType;
 import com.mpip.chatstation.Networking.ConnectToServerThread;
-import com.mpip.chatstation.Config.MessageType;
-import com.mpip.chatstation.Packets.LoginPacket;
-import com.mpip.chatstation.Packets.ReceiveUserPacket;
-import com.mpip.chatstation.Packets.RequestUserPacket;
+import com.mpip.chatstation.Networking.KryoListener;
 import com.mpip.chatstation.Packets.SystemMessagePacket;
-import com.mpip.chatstation.Packets.RegisterPacket;
+import com.mpip.chatstation.Packets.UserPacket;
 import com.mpip.chatstation.R;
 
 public class MainActivity extends AppCompatActivity
 {
-    Button btnRegister;
-    Button btnLogin;
-    Button btnReconnect;
+    private static Button btnRegister;
+    private static Button btnLogin;
+    private static Button btnReconnect;
 
-    Listener listener;
-
-    Intent backToMainIntent;
     public static Client client;
 
     @Override
@@ -39,6 +32,7 @@ public class MainActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        KryoListener.currentActivity = this;
 
         btnRegister = findViewById(R.id.btnMainRegister);
         btnLogin = findViewById(R.id.btnMainLogin);
@@ -47,46 +41,27 @@ public class MainActivity extends AppCompatActivity
         btnReconnect = findViewById(R.id.btnMainReconnect);
         btnReconnect.setVisibility(View.GONE);
 
-        backToMainIntent = new Intent(this, MainActivity.class);
-
         if (client == null)
         {
             client = new Client();
             Kryo kryo = client.getKryo();
-            kryo.register(MessageType.class);
+            kryo.register(SystemMessagePacketType.class);
             kryo.register(SystemMessagePacket.class);
-            kryo.register(RegisterPacket.class);
-            kryo.register(LoginPacket.class);
-            kryo.register(RequestUserPacket.class);
-            kryo.register(ReceiveUserPacket.class);
+            kryo.register(UserPacketType.class);
+            kryo.register(UserPacket.class);
             client.start();
         }
 
-        listener = new Listener()
+        if (KryoListener.listener == null)
         {
-            public void received(Connection connection, Object object)
-            {
-                if (object instanceof SystemMessagePacket)
-                {
-                    SystemMessagePacket systemMessage = (SystemMessagePacket)object;
-
-                    switch (systemMessage.type)
-                    {
-                        case SERVER_CLOSED:
-                            backToMainIntent.putExtra("message", systemMessage.message);
-                            startActivity(backToMainIntent);
-                            break;
-                    }
-                }
-            }
-        };
-
-        client.addListener(listener);
+            KryoListener.createListener();
+            client.addListener(KryoListener.listener);
+        }
 
         Bundle extras = getIntent().getExtras();
         if(extras != null)
         {
-            Toast.makeText(this,extras.getString("message"),Toast.LENGTH_LONG).show();
+            Toast.makeText(this,extras.getString(Constants.MESSAGE),Toast.LENGTH_LONG).show();
             btnRegister.setEnabled(false);
             btnLogin.setEnabled(false);
             btnReconnect.setVisibility(View.VISIBLE);
@@ -97,13 +72,13 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    public void registerMain(View view)
+    public void register(View view)
     {
         Intent intent = new Intent(this, RegisterActivity.class);
         startActivity(intent);
     }
 
-    public void loginMain(View view)
+    public void login(View view)
     {
         Intent intent = new Intent(this, LoginActivity.class);
         startActivity(intent);
@@ -114,17 +89,17 @@ public class MainActivity extends AppCompatActivity
         connectToServer();
     }
 
-    public void connectToServer()
+    private void connectToServer()
     {
         try
         {
-            ConnectToServerThread thread = new ConnectToServerThread(client, "78.157.30.124", 54555, 1000);
+            ConnectToServerThread thread = new ConnectToServerThread(client, "78.157.30.102", 54555, 1000);
             thread.start();
             try
             {
                 thread.join();
             }
-            catch (InterruptedException e) {}
+            catch (InterruptedException e) {e.printStackTrace();}
             if (thread.connectionSuccessful)
             {
                 Toast.makeText(this,"Connected to server",Toast.LENGTH_LONG).show();
@@ -140,10 +115,7 @@ public class MainActivity extends AppCompatActivity
                 btnReconnect.setVisibility(View.VISIBLE);
             }
         }
-        catch(Exception e)
-        {
-            e.printStackTrace();
-        }
+        catch(Exception e) { e.printStackTrace();}
     }
 
     public void testButtonClick(View view){
