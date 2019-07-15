@@ -122,4 +122,9 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(this, NavUiMainActivity.class);
         startActivityForResult(intent, 0);
     }
+
+    public void testNewLoginButtonClick(View view){
+        Intent intent = new Intent(this, TestLoginActivity.class);
+        startActivityForResult(intent, 0);
+    }
 }
