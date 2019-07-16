@@ -7,6 +7,7 @@
     <string name="hide_pwd">Hide Password</string>
     <string name="forgot">Forgot password?</string>
     <string name="newUser">Not a Member yet? Sign Up here.</string>
+    <string name="username">Username</string>
     <string name="firstName">First Name</string>
     <string name="lastName">Last Name</string>
     <string name="age">Age</string>

@@ -3,6 +3,7 @@ package com.mpip.chatstation.Fragments;
 import android.content.res.ColorStateList;
 import android.content.res.XmlResourceParser;
 import android.os.Bundle;
+import android.util.Patterns;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -17,15 +18,20 @@ import androidx.fragment.app.Fragment;
 
 import com.mpip.chatstation.Activities.TestLoginActivity;
 import com.mpip.chatstation.Config.Constants;
+import com.mpip.chatstation.Config.UserPacketType;
 import com.mpip.chatstation.CustomToast;
+import com.mpip.chatstation.Networking.SendPacketThread;
+import com.mpip.chatstation.Packets.UserPacket;
 import com.mpip.chatstation.R;
+
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class SignUpFragment extends Fragment implements OnClickListener {
     private static View view;
-    private static EditText firstName, lastName, emailId, mobileNumber, location,
+    private static EditText firstName, lastName, emailId, age, username,
             password, confirmPassword;
     private static TextView login;
     private static Button signUpButton;
@@ -54,6 +60,8 @@ public class SignUpFragment extends Fragment implements OnClickListener {
         signUpButton = (Button) view.findViewById(R.id.signUpBtn);
         login = (TextView) view.findViewById(R.id.already_user);
         terms_conditions = (CheckBox) view.findViewById(R.id.terms_conditions);
+        age = view.findViewById(R.id.regAge);
+        username = view.findViewById(R.id.regUsername);
 
         // Setting text selector over textviews
         XmlResourceParser xrp = getResources().getXml(R.xml.test_text_selector);
@@ -100,23 +108,21 @@ public class SignUpFragment extends Fragment implements OnClickListener {
         String getEmailId = emailId.getText().toString();
         String getPassword = password.getText().toString();
         String getConfirmPassword = confirmPassword.getText().toString();
-
-        // Pattern match for email id
-        Pattern p = Pattern.compile(Constants.regEx);
-        Matcher m = p.matcher(getEmailId);
+        String getAge = age.getText().toString();
+        String getUsername = username.getText().toString();
 
         // Check if all strings are null or not
-        if (getFirstName.equals("") || getFirstName.length() == 0
+        if (getUsername.equals("") || getUsername.length() == 0
                 || getEmailId.equals("") || getEmailId.length() == 0
                 || getPassword.equals("") || getPassword.length() == 0
                 || getConfirmPassword.equals("")
                 || getConfirmPassword.length() == 0)
 
             new CustomToast().Show_Toast(getActivity(), view,
-                    "All fields are required.");
+                    " Fields with red underline are required.");
 
             // Check if email id valid or not
-        else if (!m.find())
+        else if (!Pattern.compile(String.valueOf(Patterns.EMAIL_ADDRESS)).matcher(getEmailId).matches())
             new CustomToast().Show_Toast(getActivity(), view,
                     "Your Email Id is Invalid.");
 
@@ -131,9 +137,29 @@ public class SignUpFragment extends Fragment implements OnClickListener {
                     "Please select Terms and Conditions.");
 
             // Else do signup or do your stuff
-        else
-            Toast.makeText(getActivity(), "Do SignUp.", Toast.LENGTH_SHORT)
-                    .show();
+        else{
+//            Toast.makeText(getActivity(), "Do SignUp.", Toast.LENGTH_SHORT)
+//                    .show();
+
+            UserPacket user = new UserPacket();
+            user.type = UserPacketType.REGISTER_USER;
+            user.id = -1;
+            user.email = getEmailId;
+            user.username = getUsername;
+            user.password = BCrypt.hashpw(getPassword, Constants.SALT);
+            user.first_name = getFirstName;
+            user.last_name = getLastName;
+
+            if (getAge.length() > 0)
+                user.age = Integer.valueOf(getAge);
+
+
+
+            new SendPacketThread(user).test();
+
+        }
 
     }
+
+
 }

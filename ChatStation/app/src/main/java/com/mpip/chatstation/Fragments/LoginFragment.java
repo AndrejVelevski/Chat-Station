@@ -163,11 +163,6 @@ public class LoginFragment extends Fragment implements OnClickListener {
         String getEmailId = emailid.getText().toString();
         String getPassword = password.getText().toString();
 
-        // Check patter for email id
-        Pattern p = Pattern.compile(Constants.regEx);
-
-        Matcher m = p.matcher(getEmailId);
-
         // Check for both field is empty or not
         if (getEmailId.equals("") || getEmailId.length() == 0
                 || getPassword.equals("") || getPassword.length() == 0) {
@@ -182,11 +177,14 @@ public class LoginFragment extends Fragment implements OnClickListener {
             new CustomToast().Show_Toast(getActivity(), view,
                     "Your Email Id is Invalid.");
             // Else do login and do your stuff
-        else
+        else{
+            System.out.println("LOGIN: "+getEmailId + " | " + getPassword);
             Toast.makeText(getActivity(), "Do Login.", Toast.LENGTH_SHORT)
                     .show();
+        }
 
-        System.out.println("LOGIN: "+getEmailId);
+
+
 
     }
 }
