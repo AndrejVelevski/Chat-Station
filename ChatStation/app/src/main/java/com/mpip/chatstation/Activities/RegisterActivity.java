@@ -2,7 +2,6 @@ package com.mpip.chatstation.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
@@ -10,10 +9,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.mpip.chatstation.Config.Constants;
-import com.mpip.chatstation.Config.UserPacketType;
 import com.mpip.chatstation.Networking.KryoListener;
 import com.mpip.chatstation.Networking.SendPacketThread;
-import com.mpip.chatstation.Packets.UserPacket;
+import com.mpip.chatstation.Packets.RegisterUserPacket;
 import com.mpip.chatstation.R;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -51,25 +49,22 @@ public class RegisterActivity extends AppCompatActivity
 
     public void register(View view)
     {
-        UserPacket user = new UserPacket();
-        user.type = UserPacketType.REGISTER_USER;
-        user.id = -1;
-        user.email = etEmail.getText().toString();
-        user.username = etUsername.getText().toString();
-        user.password = BCrypt.hashpw(etPassword.getText().toString(), Constants.SALT);
-        user.first_name = etFirstName.getText().toString();
-        user.last_name = etLastName.getText().toString();
-
+        RegisterUserPacket packet = new RegisterUserPacket();
+        packet.email = etEmail.getText().toString();
+        packet.username = etUsername.getText().toString();
+        packet.password = BCrypt.hashpw(etPassword.getText().toString(), Constants.SALT);
+        packet.first_name = etFirstName.getText().toString();
+        packet.last_name = etLastName.getText().toString();
         if (etAge.getText().toString().length() > 0)
-            user.age = Integer.valueOf(etAge.getText().toString());
+            packet.age = Integer.valueOf(etAge.getText().toString());
 
         boolean error = false;
-        if (!Pattern.compile(String.valueOf(Patterns.EMAIL_ADDRESS)).matcher(user.email).matches())
+        if (!Pattern.compile(String.valueOf(Patterns.EMAIL_ADDRESS)).matcher(packet.email).matches())
         {
             error = true;
             tvErrorMessage.setText("Not a valid email address.");
         }
-        else if (user.username.trim().length() == 0)
+        else if (packet.username.trim().length() == 0)
         {
             error = true;
             tvErrorMessage.setText("Username field can't be empty.");
@@ -87,7 +82,7 @@ public class RegisterActivity extends AppCompatActivity
 
         if (!error)
         {
-            new SendPacketThread(user).start();
+            new SendPacketThread(packet).start();
         }
     }
 

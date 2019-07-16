@@ -13,7 +13,9 @@ import Exceptions.EmailAlreadyExistsException;
 import Exceptions.IncorrectConfirmationCodeException;
 import Exceptions.IncorrectUsernameOrPasswordException;
 import Exceptions.UsernameAlreadyExistsException;
-import Packets.UserPacket;
+import Packets.LoginUserPacket;
+import Packets.ReceiveUserPacket;
+import Packets.RegisterUserPacket;
 
 public class Database
 {
@@ -155,7 +157,7 @@ public class Database
 		}
 	}
 	
-	public void registerUser(UserPacket user) throws EmailAlreadyExistsException, UsernameAlreadyExistsException
+	public void registerUser(RegisterUserPacket user) throws EmailAlreadyExistsException, UsernameAlreadyExistsException
 	{
 		String sql;
 		
@@ -200,7 +202,7 @@ public class Database
 		} catch (SQLException e){e.printStackTrace();}
 	}
 	
-	public void loginUser(UserPacket user) throws IncorrectUsernameOrPasswordException, AccountNotConfirmedException
+	public void loginUser(LoginUserPacket user) throws IncorrectUsernameOrPasswordException, AccountNotConfirmedException
 	{
 		String sql;
 		
@@ -217,7 +219,7 @@ public class Database
 			{
 				if (!rs.getBoolean("confirmed"))
 				{
-					throw new AccountNotConfirmedException(String.format("Account %s is not confirmed.", user.username));
+					throw new AccountNotConfirmedException(String.format("Account %s is not confirmed.", user.email));
 				}
 				
 				sql = String.format(
@@ -285,15 +287,15 @@ public class Database
 		} catch (SQLException e) {e.printStackTrace();}
 	}
 	
-	public UserPacket getUser(String usernameEmail)
+	public ReceiveUserPacket getUser(String username_email)
 	{
-		UserPacket user = new UserPacket();
+		ReceiveUserPacket user = new ReceiveUserPacket();
 		
 		String sql = 
 		String.format(
 		  "SELECT * FROM user "
 		+ "WHERE (email = '%s' OR username = '%s');",
-		usernameEmail, usernameEmail);
+		username_email, username_email);
 		
 		ResultSet rs;
 		try 
@@ -301,7 +303,6 @@ public class Database
 			rs = statement.executeQuery(sql);
 			rs.first();
 			
-			user.id = rs.getInt("id");
 			user.email = rs.getString("email");
 			user.username = rs.getString("username");
 			user.first_name = rs.getString("first_name");

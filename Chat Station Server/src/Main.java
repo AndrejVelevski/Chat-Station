@@ -1,5 +1,11 @@
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 import com.esotericsoftware.kryo.Kryo;
@@ -7,124 +13,113 @@ import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Server;
 
-import Config.SystemMessagePacketType;
-import Config.UserPacketType;
+import Config.ChatRoom;
+import Config.User;
 import Exceptions.AccountNotConfirmedException;
 import Exceptions.EmailAlreadyExistsException;
 import Exceptions.IncorrectConfirmationCodeException;
 import Exceptions.IncorrectUsernameOrPasswordException;
 import Exceptions.UsernameAlreadyExistsException;
+import Packets.ConfirmUserPacket;
+import Packets.LoginUserPacket;
+import Packets.MessagePacket;
+import Packets.ReceiveUserPacket;
+import Packets.RegisterUserPacket;
+import Packets.RequestUserPacket;
+import Packets.ResendCodePacket;
 import Packets.SystemMessagePacket;
-import Packets.UserPacket;
 
 public class Main
 {
+	static Database db;
+	static SystemMessagePacket systemMessagePacket;
+	static Map<Integer, User> connectedUsers;
+	static List<User> queue;
+	static List<ChatRoom> chatrooms;
+	
 	public static void main(String[] args) throws IOException
 	{
 		Server server = new Server();
 	    server.bind(54555);
 	    
 	    Kryo kryo = server.getKryo();
-	    kryo.register(SystemMessagePacketType.class);
-        kryo.register(SystemMessagePacket.class);
-        kryo.register(UserPacketType.class);
-        kryo.register(UserPacket.class);
+	    kryo.register(SystemMessagePacket.Type.class);
+	    kryo.register(SystemMessagePacket.class);
+        kryo.register(RegisterUserPacket.class);
+        kryo.register(LoginUserPacket.class);
+        kryo.register(ConfirmUserPacket.class);
+        kryo.register(ResendCodePacket.class);
+        kryo.register(RequestUserPacket.class);
+        kryo.register(ReceiveUserPacket.class);
+        kryo.register(MessagePacket.Type.class);
+        kryo.register(MessagePacket.class);
 	    
-	    Database db = new Database("chatstation");
+	    db = new Database("chatstation");
+	    connectedUsers = new HashMap<Integer, User>();
+	    queue = new ArrayList<User>();
+	    chatrooms = new ArrayList<ChatRoom>();
 	    
 	    server.start();
 	    
-	    SystemMessagePacket systemMessage = new SystemMessagePacket();
+	    systemMessagePacket = new SystemMessagePacket();
 	    
 	    server.addListener(new Listener()
 	    {
 	        public void received (Connection connection, Object object)
 	        {
-	        	if (object instanceof UserPacket)
+	        	if (object instanceof SystemMessagePacket)
 	        	{
-	        		UserPacket user = (UserPacket)object;
+	        		SystemMessagePacket packet = (SystemMessagePacket)object;
 	        		
-	        		switch (user.type)
+	        		switch (packet.type)
 	        		{
-	        			case REGISTER_USER:
-	        			{
-	        				try
-	    	        		{
-	    	        			db.registerUser(user);
-	    						systemMessage.type = SystemMessagePacketType.REGISTER_SUCCESS;
-	    	        			systemMessage.message = "Registered successfully.";
-	    	        			connection.sendTCP(systemMessage);
-	    	        			System.out.println(String.format("Registered user '%s'...", user.email));
-	    					}
-	    	        		catch (EmailAlreadyExistsException | UsernameAlreadyExistsException e)
-	    	        		{
-	    	        			systemMessage.type = SystemMessagePacketType.REGISTER_FAILED;
-	    	        			systemMessage.message = e.getMessage();
-	    	        			connection.sendTCP(systemMessage);
-	    					}
-	        				break;
-	        			}
-	        				
-	        			case LOGIN_USER:
-	        			{
-	        				try
-	    	        		{
-	    						db.loginUser(user);
-	    						systemMessage.type = SystemMessagePacketType.LOGIN_SUCCESS;
-	    	        			systemMessage.message = "Logged in successfully.";
-	    	        			connection.sendTCP(systemMessage);
-	    	        			System.out.println(String.format("Logged in user '%s'...", user.email));
-	    					}
-	    	        		catch (IncorrectUsernameOrPasswordException e)
-	    	        		{
-	    	        			systemMessage.type = SystemMessagePacketType.LOGIN_FAILED;
-	    	        			systemMessage.message = e.getMessage();
-	    	        			connection.sendTCP(systemMessage);
-	    					}
-	        				catch (AccountNotConfirmedException e)
-	        				{
-	        					systemMessage.type = SystemMessagePacketType.ACCOUNT_NOT_CONFIRMED;
-	    	        			systemMessage.message = e.getMessage();
-	    	        			connection.sendTCP(systemMessage);
-							}
-	        				break;
-	        			}
-	        				
-	        			case REQUEST_USER:
-	        			{
-	        				UserPacket receiveUser = db.getUser(user.email);
-	        				receiveUser.type = UserPacketType.RECEIVE_USER;
-    						connection.sendTCP(receiveUser);
-	    					break;
-	        			}
-	    					
-	        			case RESEND_CODE:
+		        		case LOGOUT:
 		        		{
-		        			UserPacket receiveUser = db.getUser(user.email);
-		        			db.sendConfirmationCode(receiveUser.email, receiveUser.username);
+		        			logoutUser(connection, packet);
 		        			break;
 		        		}
-	        				
-						case CONFIRM_CODE:
-						{
-							try
-							{
-								db.confirmAccount(user.email, user.confirm_code.toUpperCase());
-								systemMessage.type = SystemMessagePacketType.CONFIRMATION_CODE_SUCCESS;
-	    	        			systemMessage.message = "Account confirmed successfully.";
-	    	        			connection.sendTCP(systemMessage);
-							}
-							catch (IncorrectConfirmationCodeException e)
-							{
-								systemMessage.type = SystemMessagePacketType.CONFIRMATION_CODE_FAILED;
-	    	        			systemMessage.message = e.getMessage();
-	    	        			connection.sendTCP(systemMessage);
-							}
-							break;
-						}
-						default:
-							break;
+		        		case REQUEST_RANDOM_CHAT:
+		        		{
+		        			addUserToQueue(connection);
+		        			break;
+		        		}
+		        		case STOP_RANDOM_CHAT:
+		        		{
+		        			removeUserFromQueue(connection);
+		        			break;
+		        		}
 	        		}
+	        	}
+	        	else if (object instanceof RegisterUserPacket)
+	        	{
+	        		RegisterUserPacket packet = (RegisterUserPacket)object;
+	        		registerUser(connection, packet);
+	        	}
+	        	else if (object instanceof LoginUserPacket)
+	        	{
+	        		LoginUserPacket packet = (LoginUserPacket)object;
+	        		loginUser(connection, packet);
+	        	}
+	        	else if (object instanceof RequestUserPacket)
+	        	{
+	        		RequestUserPacket packet = (RequestUserPacket)object;
+	        		requestUser(connection, packet);
+	        	}
+	        	else if (object instanceof ResendCodePacket)
+	        	{
+	        		ResendCodePacket packet = (ResendCodePacket)object;
+	        		resendCode(connection, packet);
+	        	}
+	        	else if (object instanceof ConfirmUserPacket)
+	        	{
+	        		ConfirmUserPacket packet = (ConfirmUserPacket)object;
+	        		confirmUser(connection, packet);
+	        	}
+	        	else if (object instanceof MessagePacket)
+	        	{
+	        		MessagePacket packet = (MessagePacket)object;
+	        		
+	        		sendMessage(connection, packet);
 	        	}
 	        }
 	     });
@@ -141,9 +136,9 @@ public class Main
 	    	{
 		    	case "/stop":
 		    	{
-		    		systemMessage.type = SystemMessagePacketType.SERVER_CLOSED;
-		    		systemMessage.message = "Server closed.";
-		    		Arrays.stream(server.getConnections()).forEach(c -> c.sendTCP(systemMessage));
+		    		systemMessagePacket.type = SystemMessagePacket.Type.SERVER_CLOSED;
+		    		systemMessagePacket.message = "Server closed.";
+		    		Arrays.stream(server.getConnections()).forEach(c -> c.sendTCP(systemMessagePacket));
 		    		
 		    		server.close();
 		    		server.stop();
@@ -159,10 +154,147 @@ public class Main
 		    		Arrays.stream(connections).forEach(c -> System.out.println(c.getRemoteAddressTCP()));
 		    		break;
 		    	}
+		    	case "/connected":
+		    	{
+		    		System.out.println(String.format("Total connected users: %d", connectedUsers.size()));
+		    		break;
+		    	}
+		    	case "/queue":
+		    	{
+		    		System.out.println(String.format("Total users in queue: %d", queue.size()));
+		    		break;
+		    	}
+		    	case "/chatrooms":
+		    	{
+		    		System.out.println(String.format("Totalchatrooms: %d", chatrooms.size()));
+		    		break;
+		    	}
 	    	}
 	    }
 	    
 		scan.close();
 	}
 
+	private static void registerUser(Connection connection, RegisterUserPacket packet)
+	{
+		try
+		{
+			db.registerUser(packet);
+			systemMessagePacket.type = SystemMessagePacket.Type.REGISTER_SUCCESS;
+			systemMessagePacket.message = "Registered successfully.";
+			connection.sendTCP(systemMessagePacket);
+			System.out.println(String.format("Registered user '%s'...", packet.email));
+		}
+		catch (EmailAlreadyExistsException | UsernameAlreadyExistsException e)
+		{
+			systemMessagePacket.type = SystemMessagePacket.Type.REGISTER_FAILED;
+			systemMessagePacket.message = e.getMessage();
+			connection.sendTCP(systemMessagePacket);
+		}
+	}
+	
+	private static void loginUser(Connection connection, LoginUserPacket packet)
+	{
+		try
+		{
+			db.loginUser(packet);
+			systemMessagePacket.type = SystemMessagePacket.Type.LOGIN_SUCCESS;
+			systemMessagePacket.message = "Logged in successfully.";
+			connection.sendTCP(systemMessagePacket);
+			System.out.println(String.format("Logged in user '%s'...", packet.email));
+			ReceiveUserPacket user = db.getUser(packet.email);
+			connectedUsers.put(connection.getID(), new User(connection, user.username));
+		}
+		catch (IncorrectUsernameOrPasswordException e)
+		{
+			systemMessagePacket.type = SystemMessagePacket.Type.LOGIN_FAILED;
+			systemMessagePacket.message = e.getMessage();
+			connection.sendTCP(systemMessagePacket);
+		}
+		catch (AccountNotConfirmedException e)
+		{
+			systemMessagePacket.type = SystemMessagePacket.Type.ACCOUNT_NOT_CONFIRMED;
+			systemMessagePacket.message = e.getMessage();
+			connection.sendTCP(systemMessagePacket);
+		}
+	}
+	
+	private static void logoutUser(Connection connection, SystemMessagePacket packet)
+	{
+		connectedUsers.remove(connection.getID());
+		System.out.println(packet.message);
+	}
+	
+	private static void requestUser(Connection connection, RequestUserPacket packet)
+	{
+		ReceiveUserPacket user = db.getUser(packet.username_email);
+		connection.sendTCP(user);
+	}
+	
+	
+
+	private static void resendCode(Connection connection, ResendCodePacket packet)
+	{
+		ReceiveUserPacket user = db.getUser(packet.email);
+		db.sendConfirmationCode(user.email, user.username);
+	}
+
+	private static void confirmUser(Connection connection, ConfirmUserPacket packet)
+	{
+		try
+		{
+			db.confirmAccount(packet.email, packet.confirm_code.toUpperCase());
+			systemMessagePacket.type = SystemMessagePacket.Type.CONFIRMATION_CODE_SUCCESS;
+			systemMessagePacket.message = "Account confirmed successfully.";
+			connection.sendTCP(systemMessagePacket);
+		}
+		catch (IncorrectConfirmationCodeException e)
+		{
+			systemMessagePacket.type = SystemMessagePacket.Type.CONFIRMATION_CODE_FAILED;
+			systemMessagePacket.message = e.getMessage();
+			connection.sendTCP(systemMessagePacket);
+		}
+	}
+
+	private static void addUserToQueue(Connection connection)
+	{
+		queue.add(connectedUsers.get(connection.getID()));
+		
+		if (queue.size() >= 2)
+		{
+			List<User> users = new ArrayList<User>();
+			users.add(queue.remove(0));
+			users.add(queue.remove(0));
+			ChatRoom chatroom = new ChatRoom(users);
+			chatrooms.add(chatroom);
+			systemMessagePacket.type = SystemMessagePacket.Type.FOUND_RANDOM_CHAT;
+			systemMessagePacket.message = "We found a match!";
+			users.stream().forEach(uu -> uu.connection.sendTCP(systemMessagePacket));
+		}
+	}
+	
+	private static void removeUserFromQueue(Connection connection)
+	{
+		queue.remove(connectedUsers.get(connection.getID()));
+	}
+
+	private static void sendMessage(Connection connection, MessagePacket packet)
+	{
+		ChatRoom chatroom = chatrooms.stream().filter(c->c.users.stream().anyMatch(u -> u.connection.getID()==connection.getID())).findFirst().orElse(null);
+		
+		packet.date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+		
+		if (packet.type == MessagePacket.Type.LEAVE)
+		{
+			chatroom.users.remove(connectedUsers.get(connection.getID()));
+			
+			if (chatroom.users.size() == 0)
+			{
+				chatrooms.remove(chatroom);
+				return;
+			}
+		}
+		
+		chatroom.users.stream().forEach(u -> u.connection.sendTCP(packet));
+	}
 }

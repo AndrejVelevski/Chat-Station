@@ -11,12 +11,16 @@ import android.widget.Toast;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.mpip.chatstation.Config.Constants;
-import com.mpip.chatstation.Config.SystemMessagePacketType;
-import com.mpip.chatstation.Config.UserPacketType;
+import com.mpip.chatstation.Packets.ConfirmUserPacket;
+import com.mpip.chatstation.Packets.LoginUserPacket;
+import com.mpip.chatstation.Packets.MessagePacket;
 import com.mpip.chatstation.Networking.ConnectToServerThread;
 import com.mpip.chatstation.Networking.KryoListener;
+import com.mpip.chatstation.Packets.ReceiveUserPacket;
+import com.mpip.chatstation.Packets.RegisterUserPacket;
+import com.mpip.chatstation.Packets.RequestUserPacket;
+import com.mpip.chatstation.Packets.ResendCodePacket;
 import com.mpip.chatstation.Packets.SystemMessagePacket;
-import com.mpip.chatstation.Packets.UserPacket;
 import com.mpip.chatstation.R;
 
 public class MainActivity extends AppCompatActivity
@@ -45,10 +49,16 @@ public class MainActivity extends AppCompatActivity
         {
             client = new Client();
             Kryo kryo = client.getKryo();
-            kryo.register(SystemMessagePacketType.class);
+            kryo.register(SystemMessagePacket.Type.class);
             kryo.register(SystemMessagePacket.class);
-            kryo.register(UserPacketType.class);
-            kryo.register(UserPacket.class);
+            kryo.register(RegisterUserPacket.class);
+            kryo.register(LoginUserPacket.class);
+            kryo.register(ConfirmUserPacket.class);
+            kryo.register(ResendCodePacket.class);
+            kryo.register(RequestUserPacket.class);
+            kryo.register(ReceiveUserPacket.class);
+            kryo.register(MessagePacket.Type.class);
+            kryo.register(MessagePacket.class);
             client.start();
         }
 
@@ -93,7 +103,7 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            ConnectToServerThread thread = new ConnectToServerThread(client, "78.157.30.102", 54555, 1000);
+            ConnectToServerThread thread = new ConnectToServerThread(client, "78.157.30.150", 54555, 1000);
             thread.start();
             try
             {

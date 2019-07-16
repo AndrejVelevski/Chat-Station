@@ -2,7 +2,6 @@ package com.mpip.chatstation.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
@@ -10,10 +9,9 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 import com.mpip.chatstation.Config.Constants;
-import com.mpip.chatstation.Config.UserPacketType;
+import com.mpip.chatstation.Packets.LoginUserPacket;
 import com.mpip.chatstation.Networking.KryoListener;
 import com.mpip.chatstation.Networking.SendPacketThread;
-import com.mpip.chatstation.Packets.UserPacket;
 import com.mpip.chatstation.R;
 
 import org.mindrot.jbcrypt.BCrypt;
@@ -40,18 +38,17 @@ public class LoginActivity extends AppCompatActivity
 
     public void login(View view)
     {
-        UserPacket user = new UserPacket();
-        user.type = UserPacketType.LOGIN_USER;
-        user.email = etEmail.getText().toString();
-        user.password = BCrypt.hashpw(etPassword.getText().toString(), Constants.SALT);
+        LoginUserPacket packet = new LoginUserPacket();
+        packet.email = etEmail.getText().toString();
+        packet.password = BCrypt.hashpw(etPassword.getText().toString(), Constants.SALT);
 
-        if (!Pattern.compile(String.valueOf(Patterns.EMAIL_ADDRESS)).matcher(user.email).matches())
+        if (!Pattern.compile(String.valueOf(Patterns.EMAIL_ADDRESS)).matcher(packet.email).matches())
         {
             tvErrorMessage.setText("Not a valid email address.");
         }
         else
         {
-            new SendPacketThread(user).start();
+            new SendPacketThread(packet).start();
         }
 
     }
