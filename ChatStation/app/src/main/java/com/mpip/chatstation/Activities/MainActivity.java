@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            ConnectToServerThread thread = new ConnectToServerThread(client, "78.157.30.150", 54555, 1000);
+            ConnectToServerThread thread = new ConnectToServerThread(client, "78.157.30.135", 54555, 1000);
             thread.start();
             try
             {

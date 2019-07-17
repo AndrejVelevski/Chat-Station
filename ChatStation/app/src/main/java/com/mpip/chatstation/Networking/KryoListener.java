@@ -13,6 +13,7 @@ import com.mpip.chatstation.Activities.LoginActivity;
 import com.mpip.chatstation.Activities.MainActivity;
 import com.mpip.chatstation.Activities.RegisterActivity;
 import com.mpip.chatstation.Config.Constants;
+import com.mpip.chatstation.Models.ChatMessage;
 import com.mpip.chatstation.Packets.MessagePacket;
 import com.mpip.chatstation.Packets.ReceiveUserPacket;
 import com.mpip.chatstation.Packets.SystemMessagePacket;
@@ -162,14 +163,19 @@ public class KryoListener
                         message = packet.message;
                     }
 
-                    ChatRoomActivity.data.add(message);
+                    //ChatRoomActivity.data.add(message);
+
+
                     currentActivity.runOnUiThread(new Runnable()
                     {
                         @Override
                         public void run()
                         {
-                            ChatRoomActivity.mbAdapter.notifyDataSetChanged();
-                            ChatRoomActivity.rvMessageBox.scrollToPosition(ChatRoomActivity.data.size()-1);
+                            boolean belongsToMe = false;
+                            if(packet.username.equals(HomeActivity.user.username)) belongsToMe = true;
+                            ChatRoomActivity.messageAdapter.add(new ChatMessage(packet.message,packet.username,belongsToMe, packet.date));
+                            //notifyDataSetChanged();
+                            ChatRoomActivity.messagesView.setSelection(ChatRoomActivity.messagesView.getCount() - 1);
                         }
                     });
                 }

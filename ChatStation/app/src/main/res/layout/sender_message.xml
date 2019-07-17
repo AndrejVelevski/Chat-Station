@@ -11,7 +11,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/message_body"
+        android:id="@+id/chatMessage_body"
         android:background="@drawable/sender_message"
         android:textColor="#fff"
         android:padding="10dp"
@@ -20,5 +20,15 @@
         android:layout_alignParentEnd="true"
         android:text="Placeholder message"
         />
+
+    <TextView
+        android:id="@+id/msgSentAt"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/chatMessage_body"
+        android:layout_alignEnd="@id/chatMessage_body"
+        android:layout_marginEnd="5dp"
+        android:paddingTop="4dp"
+        android:text="10/10/2005 10:15" />
 
 </RelativeLayout>

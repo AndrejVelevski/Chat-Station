@@ -1,30 +1,30 @@
 package com.mpip.chatstation.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
+
 
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ListView;
 
-import com.mpip.chatstation.Adapters.MessageBoxAdapter;
+import com.mpip.chatstation.Adapters.ChatMessageAdapter;
+import com.mpip.chatstation.Models.ChatMessage;
 import com.mpip.chatstation.Networking.SendPacketThread;
 import com.mpip.chatstation.Packets.MessagePacket;
-import com.mpip.chatstation.Packets.SystemMessagePacket;
 import com.mpip.chatstation.R;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
 public class ChatRoomActivity extends AppCompatActivity
 {
 
-    public static RecyclerView.Adapter mbAdapter;
-    private RecyclerView.LayoutManager layoutManager;
-    public static RecyclerView rvMessageBox;
     private static EditText etMessage;
+    public static ChatMessageAdapter messageAdapter;
+    public static ListView messagesView;
 
     public static final List<String> data = new ArrayList<String>();;
 
@@ -36,20 +36,18 @@ public class ChatRoomActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
-        rvMessageBox = findViewById(R.id.rvChatRoomMessageBox);
-        layoutManager = new LinearLayoutManager(this);
-        rvMessageBox.setLayoutManager(layoutManager);
-        mbAdapter = new MessageBoxAdapter(data);
-        rvMessageBox.setAdapter(mbAdapter);
-        data.clear();
+        messagesView = findViewById(R.id.messageBox);
+        messageAdapter = new ChatMessageAdapter(ChatRoomActivity.this);
+        etMessage = findViewById(R.id.etMessage);
+        messagesView.setAdapter(messageAdapter);
 
-        etMessage = findViewById(R.id.etChatRoomMessage);
+        data.clear();
 
         message = new MessagePacket();
         message.username = HomeActivity.user.username;
-
         message.type = MessagePacket.Type.JOIN;
         message.message = String.format("User %s has entered the chat.", HomeActivity.user.username);
+
         new SendPacketThread(message).start();
     }
 
@@ -64,14 +62,22 @@ public class ChatRoomActivity extends AppCompatActivity
         finish();
     }
 
-    public void send(View view)
-    {
+    public void sendMessage(View view) {
+        String msgText= etMessage.getText().toString();
         message.type = MessagePacket.Type.MESSAGE;
-        message.message = etMessage.getText().toString();
-        etMessage.setText("");
-        if (message.message.trim().length() > 0)
-        {
-            new SendPacketThread(message).start();
+        message.message = msgText;
+
+        if (msgText.trim().length() > 0) {
+
+            runOnUiThread(()->{
+                messageAdapter.add(new ChatMessage("sda", HomeActivity.user.username, true, new Date().toString()));
+                // scroll the ListView to the last added element
+                messagesView.setSelection(messagesView.getCount() - 1);
+
+                new SendPacketThread(message).start();
+            });
+
+            etMessage.getText().clear();
         }
     }
 }

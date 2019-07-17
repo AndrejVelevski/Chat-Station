@@ -20,7 +20,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/message_body"
+        android:id="@+id/chatMessage_body"
         android:layout_below="@+id/receiverName"
         android:layout_alignStart="@+id/receiverName"
         android:background="@drawable/receiver_message"
@@ -32,4 +32,14 @@
         android:textSize="18sp"
         android:text="I'm a stranger or a friend. Text me asap!"
         />
+
+    <TextView
+        android:id="@+id/msgSentAt"
+        android:layout_below="@+id/chatMessage_body"
+        android:layout_alignEnd="@id/chatMessage_body"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingTop="4dp"
+        android:text="10/10/2005 10:15"/>
+
 </RelativeLayout>
