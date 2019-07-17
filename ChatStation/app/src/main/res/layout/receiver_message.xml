@@ -30,16 +30,16 @@
         android:paddingEnd="16dp"
         android:elevation="2dp"
         android:textSize="18sp"
-        android:text="I'm a stranger or a friend. Text me asap!"
+        android:text="as da"
         />
 
     <TextView
         android:id="@+id/msgSentAt"
-        android:layout_below="@+id/chatMessage_body"
-        android:layout_alignEnd="@id/chatMessage_body"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_below="@+id/chatMessage_body"
+        android:layout_alignStart="@id/chatMessage_body"
         android:paddingTop="4dp"
-        android:text="10/10/2005 10:15"/>
+        android:text="10/10/2005 10:15" />
 
 </RelativeLayout>

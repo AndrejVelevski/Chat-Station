@@ -70,9 +70,9 @@ public class ChatRoomActivity extends AppCompatActivity
         if (msgText.trim().length() > 0) {
 
             runOnUiThread(()->{
-                messageAdapter.add(new ChatMessage("sda", HomeActivity.user.username, true, new Date().toString()));
+                //messageAdapter.add(new ChatMessage(msgText, HomeActivity.user.username, true, new Date().toString()));
                 // scroll the ListView to the last added element
-                messagesView.setSelection(messagesView.getCount() - 1);
+                //messagesView.setSelection(messagesView.getCount() - 1);
 
                 new SendPacketThread(message).start();
             });
