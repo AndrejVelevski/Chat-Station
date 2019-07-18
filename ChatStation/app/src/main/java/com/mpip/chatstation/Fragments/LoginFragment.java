@@ -42,8 +42,11 @@ public class LoginFragment extends Fragment implements OnClickListener {
     private TextView forgotPassword, signUp;
     private CheckBox show_hide_password;
     private LinearLayout loginLayout;
+    public static TextView loginTV;
     private static Animation shakeAnimation;
     private static FragmentManager fragmentManager;
+
+    public static String userEmail;
 
     public LoginFragment() {
 
@@ -62,13 +65,14 @@ public class LoginFragment extends Fragment implements OnClickListener {
     private void initViews() {
         fragmentManager = getActivity().getSupportFragmentManager();
 
-        emailid = (EditText) view.findViewById(R.id.login_email);
-        password = (EditText) view.findViewById(R.id.login_password);
-        loginButton = (Button) view.findViewById(R.id.loginBtn);
-        forgotPassword = (TextView) view.findViewById(R.id.forgot_password);
-        signUp = (TextView) view.findViewById(R.id.createAccount);
-        show_hide_password = (CheckBox) view.findViewById(R.id.show_hide_password);
-        loginLayout = (LinearLayout) view.findViewById(R.id.login_layout);
+        emailid = view.findViewById(R.id.login_email);
+        password = view.findViewById(R.id.login_password);
+        loginButton = view.findViewById(R.id.loginBtn);
+        forgotPassword = view.findViewById(R.id.forgot_password);
+        signUp = view.findViewById(R.id.createAccount);
+        show_hide_password = view.findViewById(R.id.show_hide_password);
+        loginLayout = view.findViewById(R.id.login_layout);
+        loginTV = view.findViewById(R.id.loginTitle);
 
         // Load ShakeAnimation
         shakeAnimation = AnimationUtils.loadAnimation(getActivity(),
@@ -188,11 +192,18 @@ public class LoginFragment extends Fragment implements OnClickListener {
             LoginUserPacket packet = new LoginUserPacket();
             packet.email = getEmailId;
             packet.password = BCrypt.hashpw(getPassword, Constants.SALT);
+
+            userEmail = getEmailId;
             new SendPacketThread(packet).start();
         }
 
 
 
 
+    }
+
+    public void showError(){
+        new CustomToast().Show_Toast(getActivity(), view,
+                "Your credentials are invalid.");
     }
 }

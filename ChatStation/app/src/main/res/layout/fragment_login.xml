@@ -16,6 +16,7 @@
             android:gravity="center"
             android:padding="10dp"
             android:text="@string/login"
+            android:id="@+id/loginTitle"
             android:textColor="@color/white_greyish"
             android:textSize="25sp"
             android:textStyle="bold" />

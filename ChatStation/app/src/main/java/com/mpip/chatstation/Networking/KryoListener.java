@@ -13,6 +13,8 @@ import com.mpip.chatstation.Activities.LoginActivity;
 import com.mpip.chatstation.Activities.MainActivity;
 import com.mpip.chatstation.Activities.RegisterActivity;
 import com.mpip.chatstation.Config.Constants;
+import com.mpip.chatstation.Fragments.LoginFragment;
+import com.mpip.chatstation.Fragments.SignUpFragment;
 import com.mpip.chatstation.Models.ChatMessage;
 import com.mpip.chatstation.Packets.MessagePacket;
 import com.mpip.chatstation.Packets.ReceiveUserPacket;
@@ -48,7 +50,7 @@ public class KryoListener
                     {
                         case REGISTER_SUCCESS:
                         {
-                            goToConfirmAccountIntent.putExtra(Constants.EMAIL, RegisterActivity.etEmail.getText().toString());
+                            goToConfirmAccountIntent.putExtra(Constants.EMAIL, SignUpFragment.emailuserEmail);
                             currentActivity.startActivity(goToConfirmAccountIntent);
                             break;
                         }
@@ -59,14 +61,15 @@ public class KryoListener
                                 @Override
                                 public void run()
                                 {
-                                    RegisterActivity.tvErrorMessage.setText(systemMessage.message);
+                                    //RegisterActivity.tvErrorMessage.setText(systemMessage.message);
+                                    SignUpFragment.signUpTitle.setText(systemMessage.message);
                                 }
                             });
                             break;
                         }
                         case LOGIN_SUCCESS:
                         {
-                            goToHomeIntent.putExtra(Constants.EMAIL, LoginActivity.etEmail.getText().toString());
+                            goToHomeIntent.putExtra(Constants.EMAIL, LoginFragment.userEmail);
                             currentActivity.startActivity(goToHomeIntent);
                             break;
                         }
@@ -77,14 +80,15 @@ public class KryoListener
                                 @Override
                                 public void run()
                                 {
-                                    LoginActivity.tvErrorMessage.setText(systemMessage.message);
+                                    //LoginActivity.tvErrorMessage.setText(systemMessage.message);
+                                    LoginFragment.loginTV.setText(systemMessage.message);
                                 }
                             });
                             break;
                         }
                         case ACCOUNT_NOT_CONFIRMED:
                         {
-                            goToConfirmAccountIntent.putExtra(Constants.EMAIL, LoginActivity.etEmail.getText().toString());
+                            goToConfirmAccountIntent.putExtra(Constants.EMAIL, LoginFragment.userEmail);
                             currentActivity.startActivity(goToConfirmAccountIntent);
                             break;
                         }

@@ -8,10 +8,11 @@ import androidx.fragment.app.FragmentManager;
 
 import com.mpip.chatstation.Config.Constants;
 import com.mpip.chatstation.Fragments.LoginFragment;
+import com.mpip.chatstation.Fragments.SignUpFragment;
 import com.mpip.chatstation.R;
 
 public class LoginRegisterActivity extends AppCompatActivity {
-    private FragmentManager fragmentManager;
+    private static FragmentManager fragmentManager;
 
 
     @Override
@@ -21,8 +22,21 @@ public class LoginRegisterActivity extends AppCompatActivity {
 
         fragmentManager = getSupportFragmentManager();
 
-        // If savedinstnacestate is null then replace login fragment
-        if (savedInstanceState == null) {
+        Bundle extras = getIntent().getExtras();
+        if(extras != null) {
+            String value = extras.getString("REGISTERorLOGIN");
+
+            if(value.equals("Register")){
+                fragmentManager
+                        .beginTransaction()
+                        .replace(R.id.frameContainer, new SignUpFragment(),
+                                Constants.SignUp_Fragment).commit();
+            }
+
+        }
+        else if (savedInstanceState == null) {
+            // If savedinstnacestate is null then replace login fragment
+
             fragmentManager
                     .beginTransaction()
                     .replace(R.id.frameContainer, new LoginFragment(),

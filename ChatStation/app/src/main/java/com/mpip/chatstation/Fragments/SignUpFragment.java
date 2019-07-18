@@ -31,6 +31,9 @@ public class SignUpFragment extends Fragment implements OnClickListener {
     private Button signUpButton;
     private CheckBox terms_conditions;
 
+    public static TextView signUpTitle;
+    public static String emailuserEmail;
+
     public SignUpFragment() {
 
     }
@@ -56,6 +59,7 @@ public class SignUpFragment extends Fragment implements OnClickListener {
         terms_conditions = view.findViewById(R.id.terms_conditions);
         age = view.findViewById(R.id.regAge);
         username = view.findViewById(R.id.regUsername);
+        signUpTitle = view.findViewById(R.id.signUpTitle);
 
         // Setting text selector over textviews
         XmlResourceParser xrp = getResources().getXml(R.xml.text_selector);
@@ -145,6 +149,7 @@ public class SignUpFragment extends Fragment implements OnClickListener {
             if (getAge.length() > 0)
                 user.age = Integer.valueOf(getAge);
 
+            emailuserEmail = getEmailId;
             new SendPacketThread(user).start();
 
         }
