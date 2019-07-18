@@ -16,8 +16,7 @@
         <activity android:name=".Activities.ConfirmAccountActivity"></activity>
         <activity android:name=".Activities.NavUiMainActivity" />
         <activity android:name=".Activities.HomeActivity" />
-        <activity android:name=".Activities.LoginActivity" />
-        <activity android:name=".Activities.RegisterActivity" />
+        <activity android:name=".Activities.LoginRegisterActivity" />
         <activity android:name=".Activities.ChatRoomActivity" />
         <activity android:name=".Activities.MainActivity">
             <intent-filter>
