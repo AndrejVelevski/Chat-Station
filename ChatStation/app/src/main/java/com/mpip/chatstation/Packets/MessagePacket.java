@@ -6,6 +6,7 @@ public class MessagePacket
     {
         JOIN,
         LEAVE,
+        TOSELF,
         MESSAGE
     }
 

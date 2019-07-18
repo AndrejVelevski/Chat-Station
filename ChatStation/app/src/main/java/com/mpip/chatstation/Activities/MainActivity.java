@@ -16,8 +16,10 @@ import com.mpip.chatstation.Packets.LoginUserPacket;
 import com.mpip.chatstation.Packets.MessagePacket;
 import com.mpip.chatstation.Networking.ConnectToServerThread;
 import com.mpip.chatstation.Networking.KryoListener;
+import com.mpip.chatstation.Packets.ReceiveRandomChatPacket;
 import com.mpip.chatstation.Packets.ReceiveUserPacket;
 import com.mpip.chatstation.Packets.RegisterUserPacket;
+import com.mpip.chatstation.Packets.RequestRandomChatPacket;
 import com.mpip.chatstation.Packets.RequestUserPacket;
 import com.mpip.chatstation.Packets.ResendCodePacket;
 import com.mpip.chatstation.Packets.SystemMessagePacket;
@@ -57,6 +59,8 @@ public class MainActivity extends AppCompatActivity
             kryo.register(ResendCodePacket.class);
             kryo.register(RequestUserPacket.class);
             kryo.register(ReceiveUserPacket.class);
+            kryo.register(RequestRandomChatPacket.class);
+            kryo.register(ReceiveRandomChatPacket.class);
             kryo.register(MessagePacket.Type.class);
             kryo.register(MessagePacket.class);
             client.start();
@@ -103,7 +107,7 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            ConnectToServerThread thread = new ConnectToServerThread(client, "78.157.30.135", 54555, 1000);
+            ConnectToServerThread thread = new ConnectToServerThread(client, "78.157.30.172", 54555, 1000);
             thread.start();
             try
             {

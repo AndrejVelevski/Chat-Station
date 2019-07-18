@@ -1,4 +1,4 @@
-package Config;
+package Models;
 
 import com.esotericsoftware.kryonet.Connection;
 

@@ -9,14 +9,10 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 import com.mpip.chatstation.Adapters.ChatMessageAdapter;
-import com.mpip.chatstation.Models.ChatMessage;
+import com.mpip.chatstation.Config.Constants;
 import com.mpip.chatstation.Networking.SendPacketThread;
 import com.mpip.chatstation.Packets.MessagePacket;
 import com.mpip.chatstation.R;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
 
 public class ChatRoomActivity extends AppCompatActivity
@@ -24,9 +20,7 @@ public class ChatRoomActivity extends AppCompatActivity
 
     private static EditText etMessage;
     public static ChatMessageAdapter messageAdapter;
-    public static ListView messagesView;
-
-    public static final List<String> data = new ArrayList<String>();;
+    public static ListView lvMessageBox;
 
     private MessagePacket message;
 
@@ -36,26 +30,32 @@ public class ChatRoomActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
 
-        messagesView = findViewById(R.id.messageBox);
+        lvMessageBox = findViewById(R.id.lvChatRoomMessageBox);
         messageAdapter = new ChatMessageAdapter(ChatRoomActivity.this);
-        etMessage = findViewById(R.id.etMessage);
-        messagesView.setAdapter(messageAdapter);
-
-        data.clear();
+        etMessage = findViewById(R.id.etChatRoomMessage);
+        lvMessageBox.setAdapter(messageAdapter);
 
         message = new MessagePacket();
         message.username = HomeActivity.user.username;
-        message.type = MessagePacket.Type.JOIN;
-        message.message = String.format("User %s has entered the chat.", HomeActivity.user.username);
 
+        message.type = MessagePacket.Type.TOSELF;
+        message.message = getIntent().getStringExtra(Constants.MESSAGE);
         new SendPacketThread(message).start();
+
+        MessagePacket tmp = new MessagePacket();
+        tmp.username = HomeActivity.user.username;
+        tmp.type = MessagePacket.Type.JOIN;
+        tmp.message = String.format("User %s has entered the chat.", HomeActivity.user.username);
+        if (getIntent().getStringExtra(Constants.ROOM_TAGS).length() > 0)
+        {
+            tmp.message += String.format("\n%s likes: %s", HomeActivity.user.username, getIntent().getStringExtra(Constants.MATCHING_TAGS));
+        }
+        new SendPacketThread(tmp).start();
     }
 
     @Override
     public void onBackPressed()
     {
-        HomeActivity.requested = false;
-        HomeActivity.btnRandomChat.setText("Random Chat");
         message.type = MessagePacket.Type.LEAVE;
         message.message = String.format("User %s has left the chat.", HomeActivity.user.username);
         new SendPacketThread(message).start();
@@ -67,16 +67,9 @@ public class ChatRoomActivity extends AppCompatActivity
         message.type = MessagePacket.Type.MESSAGE;
         message.message = msgText;
 
-        if (msgText.trim().length() > 0) {
-
-            runOnUiThread(()->{
-                //messageAdapter.add(new ChatMessage(msgText, HomeActivity.user.username, true, new Date().toString()));
-                // scroll the ListView to the last added element
-                //messagesView.setSelection(messagesView.getCount() - 1);
-
-                new SendPacketThread(message).start();
-            });
-
+        if (msgText.trim().length() > 0)
+        {
+            new SendPacketThread(message).start();
             etMessage.getText().clear();
         }
     }

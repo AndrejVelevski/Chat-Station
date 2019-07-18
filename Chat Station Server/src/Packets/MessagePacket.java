@@ -2,10 +2,11 @@ package Packets;
 
 public class MessagePacket
 {
-    public enum Type
+	public enum Type
     {
         JOIN,
         LEAVE,
+        TOSELF,
         MESSAGE
     }
     

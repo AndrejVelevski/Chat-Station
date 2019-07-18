@@ -10,7 +10,7 @@
 
     <ListView
         android:layout_width="match_parent"
-        android:id="@+id/messageBox"
+        android:id="@+id/lvChatRoomMessageBox"
         android:layout_weight="2"
         android:divider="#fff"
         android:layout_height="0dp"
@@ -23,7 +23,7 @@
         android:orientation="horizontal">
 
         <EditText
-            android:id="@+id/etMessage"
+            android:id="@+id/etChatRoomMessage"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="2"
@@ -35,7 +35,7 @@
             android:text="" />
 
         <ImageButton
-            android:id="@+id/btnSend"
+            android:id="@+id/btnChatRoomSend"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

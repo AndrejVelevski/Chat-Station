@@ -15,6 +15,7 @@ import com.mpip.chatstation.Activities.RegisterActivity;
 import com.mpip.chatstation.Config.Constants;
 import com.mpip.chatstation.Models.ChatMessage;
 import com.mpip.chatstation.Packets.MessagePacket;
+import com.mpip.chatstation.Packets.ReceiveRandomChatPacket;
 import com.mpip.chatstation.Packets.ReceiveUserPacket;
 import com.mpip.chatstation.Packets.SystemMessagePacket;
 
@@ -105,11 +106,6 @@ public class KryoListener
                             });
                             break;
                         }
-                        case FOUND_RANDOM_CHAT:
-                        {
-                            currentActivity.startActivity(goToChatRoomIntent);
-                            break;
-                        }
                         case SERVER_CLOSED:
                         {
                             goToMainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -149,22 +145,33 @@ public class KryoListener
                         }
                     });
                 }
-                else if (object instanceof MessagePacket)
+                else if (object instanceof ReceiveRandomChatPacket)
                 {
-                    MessagePacket packet = (MessagePacket)object;
+                    ReceiveRandomChatPacket packet = (ReceiveRandomChatPacket)object;
 
-                    String message;
-                    if (packet.type == MessagePacket.Type.MESSAGE)
+                    String msg;
+                    if (packet.found)
                     {
-                        message = String.format("%s %s\n%s", packet.username, packet.date, packet.message);
+                        msg = String.format("Found a chat room.\nRoom max users: %d", packet.maxUsers);
                     }
                     else
                     {
-                        message = packet.message;
+                        msg = String.format("Could not find a chat room.\nCreated empty chat room.\nRoom max users: %d", packet.maxUsers);
+                    }
+                    if (packet.roomTags.length() > 0)
+                    {
+                        msg += String.format("\nRoom tags: %s", packet.roomTags);
                     }
 
-                    //ChatRoomActivity.data.add(message);
+                    goToChatRoomIntent.putExtra(Constants.ROOM_TAGS, packet.roomTags);
+                    goToChatRoomIntent.putExtra(Constants.MATCHING_TAGS, packet.matchingTags);
+                    goToChatRoomIntent.putExtra(Constants.MESSAGE, msg);
 
+                    currentActivity.startActivity(goToChatRoomIntent);
+                }
+                else if (object instanceof MessagePacket)
+                {
+                    MessagePacket packet = (MessagePacket)object;
 
                     currentActivity.runOnUiThread(new Runnable()
                     {
@@ -175,7 +182,7 @@ public class KryoListener
                             if(packet.username.equals(HomeActivity.user.username)) belongsToMe = true;
                             ChatRoomActivity.messageAdapter.add(new ChatMessage(packet.message,packet.username,belongsToMe, packet.date));
                             //notifyDataSetChanged();
-                            ChatRoomActivity.messagesView.setSelection(ChatRoomActivity.messagesView.getCount() - 1);
+                            ChatRoomActivity.lvMessageBox.setSelection(ChatRoomActivity.lvMessageBox.getCount() - 1);
                         }
                     });
                 }
