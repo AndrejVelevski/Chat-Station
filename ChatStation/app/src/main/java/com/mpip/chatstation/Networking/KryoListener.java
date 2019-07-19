@@ -11,6 +11,7 @@ import com.mpip.chatstation.Activities.ConfirmAccountActivity;
 import com.mpip.chatstation.Activities.HomeActivity;
 import com.mpip.chatstation.Activities.MainActivity;
 import com.mpip.chatstation.Config.Constants;
+import com.mpip.chatstation.Fragments.CustomToast;
 import com.mpip.chatstation.Fragments.LoginFragment;
 import com.mpip.chatstation.Fragments.SignUpFragment;
 import com.mpip.chatstation.Models.ChatMessage;
@@ -59,7 +60,8 @@ public class KryoListener
                                 @Override
                                 public void run()
                                 {
-                                    SignUpFragment.signUpTitle.setText(systemMessage.message);
+                                   // SignUpFragment.signUpTitle.setText(systemMessage.message);
+                                    SignUpFragment.showError(systemMessage.message);
                                 }
                             });
                             break;
@@ -77,7 +79,8 @@ public class KryoListener
                                 @Override
                                 public void run()
                                 {
-                                    LoginFragment.loginTV.setText(systemMessage.message);
+                                    //LoginFragment.loginTV.setText(systemMessage.message);
+                                    LoginFragment.showError(systemMessage.message);
                                 }
                             });
                             break;
@@ -179,7 +182,7 @@ public class KryoListener
                         {
                             boolean belongsToMe = false;
                             if(packet.username.equals(HomeActivity.user.username)) belongsToMe = true;
-                            ChatRoomActivity.messageAdapter.add(new ChatMessage(packet.message,packet.username,belongsToMe, packet.date));
+                            ChatRoomActivity.messageAdapter.add(new ChatMessage(packet.message,packet.username,belongsToMe, packet.date, packet.type));
                             //notifyDataSetChanged();
                             ChatRoomActivity.lvMessageBox.setSelection(ChatRoomActivity.lvMessageBox.getCount() - 1);
                         }

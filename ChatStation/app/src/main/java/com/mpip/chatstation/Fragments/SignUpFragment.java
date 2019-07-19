@@ -1,5 +1,6 @@
 package com.mpip.chatstation.Fragments;
 
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.XmlResourceParser;
 import android.os.Bundle;
@@ -8,11 +9,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import com.mpip.chatstation.Activities.LoginRegisterActivity;
 import com.mpip.chatstation.Config.Constants;
@@ -24,15 +29,19 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.util.regex.Pattern;
 
 public class SignUpFragment extends Fragment implements OnClickListener {
-    private View view;
+    private static View view;
     private EditText firstName, lastName, emailId, age, username,
             password, confirmPassword;
     private TextView login;
     private Button signUpButton;
     private CheckBox terms_conditions;
 
-    public static TextView signUpTitle;
+    private TextView signUpTitle;
     public static String emailuserEmail;
+
+    private static LinearLayout signUpLayout;
+    private static Animation shakeAnimation;
+    private static FragmentActivity context;
 
     public SignUpFragment() {
 
@@ -44,6 +53,7 @@ public class SignUpFragment extends Fragment implements OnClickListener {
         view = inflater.inflate(R.layout.fragment_sign_up, container, false);
         initViews();
         setListeners();
+        context = getActivity();
         return view;
     }
 
@@ -60,6 +70,10 @@ public class SignUpFragment extends Fragment implements OnClickListener {
         age = view.findViewById(R.id.regAge);
         username = view.findViewById(R.id.regUsername);
         signUpTitle = view.findViewById(R.id.signUpTitle);
+        signUpLayout = view.findViewById(R.id.signUpLayout);
+
+        shakeAnimation = AnimationUtils.loadAnimation(getActivity(),
+                R.anim.shake);
 
         // Setting text selector over textviews
         XmlResourceParser xrp = getResources().getXml(R.xml.text_selector);
@@ -114,25 +128,36 @@ public class SignUpFragment extends Fragment implements OnClickListener {
                 || getEmailId.equals("") || getEmailId.length() == 0
                 || getPassword.equals("") || getPassword.length() == 0
                 || getConfirmPassword.equals("")
-                || getConfirmPassword.length() == 0)
+                || getConfirmPassword.length() == 0){
 
-            new CustomToast().Show_Toast(getActivity(), view,
-                    " Fields with red underline are required.");
+//            signUpLayout.startAnimation(shakeAnimation);
+//            new CustomToast().Show_Toast(getActivity(), view,
+//                    "Fields with red underline are required.");
+            showError("Fields with red underline are required.");
+        }
 
             // Check if email id valid or not
-        else if (!Pattern.compile(String.valueOf(Patterns.EMAIL_ADDRESS)).matcher(getEmailId).matches())
-            new CustomToast().Show_Toast(getActivity(), view,
-                    "Your Email Id is Invalid.");
-
+        else if (!Pattern.compile(String.valueOf(Patterns.EMAIL_ADDRESS)).matcher(getEmailId).matches()){
+//            signUpLayout.startAnimation(shakeAnimation);
+//            new CustomToast().Show_Toast(getActivity(), view,
+//                    "Your Email is Invalid.");
+            showError("Your Email is Invalid.");
+        }
             // Check if both password should be equal
-        else if (!getConfirmPassword.equals(getPassword))
-            new CustomToast().Show_Toast(getActivity(), view,
-                    "Both password doesn't match.");
-
+        else if (!getConfirmPassword.equals(getPassword)){
+//            signUpLayout.startAnimation(shakeAnimation);
+//            new CustomToast().Show_Toast(getActivity(), view,
+//                    "Both passwords don't match.");
+            showError("Both passwords don't match.");
+        }
             // Make sure user should check Terms and Conditions checkbox
-        else if (!terms_conditions.isChecked())
-            new CustomToast().Show_Toast(getActivity(), view,
-                    "Please select Terms and Conditions.");
+        else if (!terms_conditions.isChecked()){
+//            signUpLayout.startAnimation(shakeAnimation);
+//            new CustomToast().Show_Toast(getActivity(), view,
+//                    "Please read Terms and Conditions.");
+            showError("Please read Terms and Conditions.");
+        }
+
 
             // Else do signup or do your stuff
         else{
@@ -151,10 +176,16 @@ public class SignUpFragment extends Fragment implements OnClickListener {
 
             emailuserEmail = getEmailId;
             new SendPacketThread(user).start();
-
         }
 
     }
 
+    public static void showError(String msg){
+        context.runOnUiThread( () -> {
+            signUpLayout.startAnimation(shakeAnimation);
+            new CustomToast().Show_Toast(context, view,
+                    msg);
+        });
+    }
 
 }

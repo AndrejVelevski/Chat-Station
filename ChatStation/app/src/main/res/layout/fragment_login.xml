@@ -36,7 +36,8 @@
             android:padding="10dp"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
-            android:textSize="16sp" />
+            android:textSize="16sp"
+            android:autofilledHighlight="@android:color/transparent"/>
 
         <View
             android:layout_width="fill_parent"

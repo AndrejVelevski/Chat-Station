@@ -1,5 +1,6 @@
 package com.mpip.chatstation.Fragments;
 
+import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.XmlResourceParser;
 import android.os.Bundle;
@@ -23,6 +24,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
 import com.mpip.chatstation.Networking.SendPacketThread;
@@ -35,18 +37,19 @@ import org.mindrot.jbcrypt.BCrypt;
 import java.util.regex.Pattern;
 
 public class LoginFragment extends Fragment implements OnClickListener {
-    private View view;
+    private static View view;
 
     private EditText emailid, password;
     private Button loginButton;
     private TextView forgotPassword, signUp;
     private CheckBox show_hide_password;
-    private LinearLayout loginLayout;
+    private static LinearLayout loginLayout;
     public static TextView loginTV;
     private static Animation shakeAnimation;
     private static FragmentManager fragmentManager;
 
     public static String userEmail;
+    private static FragmentActivity context;
 
     public LoginFragment() {
 
@@ -58,6 +61,7 @@ public class LoginFragment extends Fragment implements OnClickListener {
         view = inflater.inflate(R.layout.fragment_login, container, false);
         initViews();
         setListeners();
+        context = getActivity();
         return view;
     }
 
@@ -172,22 +176,25 @@ public class LoginFragment extends Fragment implements OnClickListener {
         // Check for both field is empty or not
         if (getEmailId.equals("") || getEmailId.length() == 0
                 || getPassword.equals("") || getPassword.length() == 0) {
-            loginLayout.startAnimation(shakeAnimation);
-            new CustomToast().Show_Toast(getActivity(), view,
-                    "Enter both credentials.");
+//            loginLayout.startAnimation(shakeAnimation);
+//            new CustomToast().Show_Toast(getActivity(), view,
+//                    "Enter both credentials.");
+            showError("Enter both credentials.");
 
         }
         // Check if email id is valid or not
         // else if (!m.find())
-        else if (!Pattern.compile(String.valueOf(Patterns.EMAIL_ADDRESS)).matcher(getEmailId).matches())
-            new CustomToast().Show_Toast(getActivity(), view,
-                    "Your Email Id is Invalid.");
+        else if (!Pattern.compile(String.valueOf(Patterns.EMAIL_ADDRESS)).matcher(getEmailId).matches()){
+//            loginLayout.startAnimation(shakeAnimation);
+//            new CustomToast().Show_Toast(getActivity(), view,
+//                    "Your Email is Invalid.");
+            showError("Your Email is Invalid.");
+        }
             // Else do login and do your stuff
         else{
-            System.out.println("LOGIN: "+getEmailId + " | " + getPassword);
-            Toast.makeText(getActivity(), "Do Login.", Toast.LENGTH_SHORT)
-                    .show();
-
+//            System.out.println("LOGIN: "+getEmailId + " | " + getPassword);
+//            Toast.makeText(getActivity(), "Do Login.", Toast.LENGTH_SHORT)
+//                    .show();
 
             LoginUserPacket packet = new LoginUserPacket();
             packet.email = getEmailId;
@@ -197,13 +204,13 @@ public class LoginFragment extends Fragment implements OnClickListener {
             new SendPacketThread(packet).start();
         }
 
-
-
-
     }
 
-    public void showError(){
-        new CustomToast().Show_Toast(getActivity(), view,
-                "Your credentials are invalid.");
+    public static void showError(String msg){
+        context.runOnUiThread( () -> {
+            loginLayout.startAnimation(shakeAnimation);
+            new CustomToast().Show_Toast(context, view,
+                    msg);
+        });
     }
 }

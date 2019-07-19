@@ -48,30 +48,54 @@ public class ChatMessageAdapter extends BaseAdapter {
     public View getView(int i, View convertView, ViewGroup viewGroup) {
         ChatMessageViewHolder holder = new ChatMessageViewHolder();
         LayoutInflater testMessageInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-        ChatMessage testMessage = chatMessages.get(i);
+        ChatMessage chatMsg = chatMessages.get(i);
 
-        if (testMessage.isBelongsToCurrentUser()) { // this Message was sent by us so let's create a basic chat bubble on the right
-            convertView = testMessageInflater.inflate(R.layout.sender_message, null);
-            holder.testMessageBody =  convertView.findViewById(R.id.chatMessage_body);
-            holder.sentAt = convertView.findViewById(R.id.msgSentAt);
+        switch (chatMsg.getType()){
+            case MESSAGE:
+                if (chatMsg.isBelongsToCurrentUser()) { // this Message was sent by us so let's create a basic chat bubble on the right
+                    convertView = testMessageInflater.inflate(R.layout.sender_message, null);
+                    holder.testMessageBody =  convertView.findViewById(R.id.chatMessage_body);
+                    holder.sentAt = convertView.findViewById(R.id.msgSentAt);
 
-            convertView.setTag(holder);
+                    convertView.setTag(holder);
 
-            holder.sentAt.setText(testMessage.getSentAt());
-            holder.testMessageBody.setText(testMessage.getText());
+                    holder.sentAt.setText(chatMsg.getSentAt());
+                    holder.testMessageBody.setText(chatMsg.getText());
 
-        } else { // this Message was sent by someone else so let's create an advanced chat bubble on the left
-            convertView = testMessageInflater.inflate(R.layout.receiver_message, null);
-            holder.name =  convertView.findViewById(R.id.receiverName);
-            holder.testMessageBody =  convertView.findViewById(R.id.chatMessage_body);
-            holder.sentAt = convertView.findViewById(R.id.msgSentAt);
+                } else { // this Message was sent by someone else so let's create an advanced chat bubble on the left
+                    convertView = testMessageInflater.inflate(R.layout.receiver_message, null);
+                    holder.name =  convertView.findViewById(R.id.receiverName);
+                    holder.testMessageBody =  convertView.findViewById(R.id.chatMessage_body);
+                    holder.sentAt = convertView.findViewById(R.id.msgSentAt);
 
-            convertView.setTag(holder);
+                    convertView.setTag(holder);
 
-            holder.name.setText(testMessage.getUserData());
-            holder.testMessageBody.setText(testMessage.getText());
-            holder.sentAt.setText(testMessage.getSentAt());
+                    holder.name.setText(chatMsg.getUserData());
+                    holder.testMessageBody.setText(chatMsg.getText());
+                    holder.sentAt.setText(chatMsg.getSentAt());
+                }
+                break;
+            case JOIN:
+            case LEAVE:
+                convertView = testMessageInflater.inflate(R.layout.server_chat_message, null);
+                holder.testMessageBody =  convertView.findViewById(R.id.chatMessage_body);
+                holder.sentAt = convertView.findViewById(R.id.msgSentAt);
+
+                convertView.setTag(holder);
+
+                holder.sentAt.setText(chatMsg.getSentAt());
+                holder.testMessageBody.setText(chatMsg.getText());
+                break;
+            case TOSELF:
+                convertView = testMessageInflater.inflate(R.layout.to_self_message, null);
+                holder.testMessageBody =  convertView.findViewById(R.id.chatMessage_body);
+
+                convertView.setTag(holder);
+
+                holder.testMessageBody.setText(chatMsg.getText());
+                break;
         }
+
 
         return convertView;
     }

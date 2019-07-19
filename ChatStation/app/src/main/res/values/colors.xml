@@ -11,4 +11,6 @@
     <color name="white_greyish">#EEEEEE</color>
     <color name="button_selectorcolor">#9E9E9E</color>
     <color name="requiredField">#FF0000</color>
+    <color name="server_msg">#FF8922</color>
+    <color name="to_self_msg">#2196F3</color>
 </resources>
