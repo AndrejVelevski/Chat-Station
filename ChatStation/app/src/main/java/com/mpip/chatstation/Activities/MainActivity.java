@@ -25,6 +25,9 @@ import com.mpip.chatstation.Packets.ResendCodePacket;
 import com.mpip.chatstation.Packets.SystemMessagePacket;
 import com.mpip.chatstation.R;
 
+import static com.mpip.chatstation.Config.Constants.serverIP;
+import static com.mpip.chatstation.Config.Constants.serverPort;
+
 public class MainActivity extends AppCompatActivity
 {
     private static Button btnRegister;
@@ -88,13 +91,17 @@ public class MainActivity extends AppCompatActivity
 
     public void register(View view)
     {
-        Intent intent = new Intent(this, RegisterActivity.class);
-        startActivity(intent);
+//        Intent intent = new Intent(this, RegisterActivity.class);
+//        startActivity(intent);
+
+        Intent i = new Intent(this, LoginRegisterActivity.class);
+        i.putExtra("REGISTERorLOGIN","Register");
+        startActivity(i);
     }
 
     public void login(View view)
     {
-        Intent intent = new Intent(this, LoginActivity.class);
+        Intent intent = new Intent(this, LoginRegisterActivity.class);
         startActivity(intent);
     }
 
@@ -107,7 +114,8 @@ public class MainActivity extends AppCompatActivity
     {
         try
         {
-            ConnectToServerThread thread = new ConnectToServerThread(client, "78.157.30.172", 54555, 1000);
+            ConnectToServerThread thread = new ConnectToServerThread(client, serverIP, serverPort, 1000);
+
             thread.start();
             try
             {

@@ -57,16 +57,6 @@ public class Main
 	    db = new Database("chatstation");
 	    connectedUsers = new HashMap<Integer, User>();
 	    chatrooms = new ArrayList<ChatRoom>();
-	    chatrooms.add(new ChatRoom(8, new HashSet<String>(), new ArrayList<User>()));
-	    chatrooms.add(new ChatRoom(19, new HashSet<String>(), new ArrayList<User>()));
-	    chatrooms.add(new ChatRoom(5, new HashSet<String>(), new ArrayList<User>()));
-	    chatrooms.add(new ChatRoom(13, new HashSet<String>(), new ArrayList<User>()));
-	    chatrooms.add(new ChatRoom(2, new HashSet<String>(), new ArrayList<User>()));
-	    chatrooms.add(new ChatRoom(4, new HashSet<String>(), new ArrayList<User>()));
-	    chatrooms.add(new ChatRoom(20, new HashSet<String>(), new ArrayList<User>()));
-	    chatrooms.add(new ChatRoom(3, new HashSet<String>(), new ArrayList<User>()));
-	    chatrooms.add(new ChatRoom(7, new HashSet<String>(), new ArrayList<User>()));
-	    chatrooms.add(new ChatRoom(16, new HashSet<String>(), new ArrayList<User>()));
 	    
 	    server.start();
 	    

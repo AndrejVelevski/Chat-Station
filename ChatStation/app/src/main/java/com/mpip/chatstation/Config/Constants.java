@@ -13,4 +13,12 @@ public class Constants
     {
         return fromY + ((toY - fromY) / (toX - fromX)) * (value - fromX);
     }
+
+    //Fragments Tags
+    public static final String Login_Fragment = "Login_Fragment";
+    public static final String SignUp_Fragment = "SignUp_Fragment";
+    public static final String ForgotPassword_Fragment = "ForgotPassword_Fragment";
+
+    public static final String serverIP = "78.157.30.172";
+    public static final int serverPort = 54555;
 }
