@@ -1,0 +1,123 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:padding="20dp" >
+
+    <LinearLayout
+        android:id="@+id/login_layout"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="vertical" >
+
+        <TextView
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/confirm_account"
+            android:id="@+id/confirmTitle"
+            android:textColor="@color/white_greyish"
+            android:textSize="25sp"
+            android:textStyle="bold" />
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1px"
+            android:background="@color/white_greyish" />
+
+        <TextView
+            android:id="@+id/tvConfirmInfo"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="55dp"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/confirm_account_info"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textColor="@color/white_greyish"
+            android:textSize="14sp"
+            android:textStyle="bold|italic" />
+
+
+    <LinearLayout
+        android:id="@+id/confirmCodeLinerLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="20dp">
+
+
+
+            <EditText
+                android:id="@+id/etConfirmAccountCode"
+                android:layout_width="fill_parent"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:drawableStart="@drawable/security"
+                android:drawablePadding="8dp"
+                android:hint="@string/confirmationHint"
+                android:inputType="textCapCharacters"
+                android:padding="10dp"
+                android:textColor="@color/white"
+                android:textColorHint="@color/white"
+                android:textSize="16sp" />
+
+            <Button
+                android:id="@+id/btnConfirmAccountConfirm"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:onClick="confirm"
+                android:text="@string/confirm"
+                android:layout_toEndOf="@+id/etConfirmAccountCode"
+                />
+
+
+
+    </LinearLayout>
+
+
+
+        <View
+            android:layout_width="fill_parent"
+            android:layout_height="1px"
+            android:background="@color/white_greyish"
+            android:layout_marginBottom="15dp"/>
+
+        <TextView
+            android:id="@+id/tvResencInfo"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:padding="10dp"
+            android:text="@string/confirm_account_resend_info"
+            android:textAlignment="center"
+            android:textAllCaps="false"
+            android:textColor="@color/white_greyish"
+            android:textSize="14sp"
+            android:textStyle="bold|italic" />
+
+
+        <Button
+            android:id="@+id/btnConfirmAccountResend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="8dp"
+            android:drawableStart="@drawable/resend"
+            android:gravity="center"
+            android:onClick="resend"
+            android:text="@string/confirm_resend" />
+
+
+
+
+
+    </LinearLayout>
+
+
+</RelativeLayout>

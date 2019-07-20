@@ -7,11 +7,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.mpip.chatstation.Activities.ChatRoomActivity;
-import com.mpip.chatstation.Activities.ConfirmAccountActivity;
 import com.mpip.chatstation.Activities.HomeActivity;
+import com.mpip.chatstation.Activities.LoginRegisterActivity;
 import com.mpip.chatstation.Activities.MainActivity;
 import com.mpip.chatstation.Config.Constants;
-import com.mpip.chatstation.Fragments.CustomToast;
+import com.mpip.chatstation.Fragments.ConfirmFragment;
 import com.mpip.chatstation.Fragments.LoginFragment;
 import com.mpip.chatstation.Fragments.SignUpFragment;
 import com.mpip.chatstation.Models.ChatMessage;
@@ -35,7 +35,7 @@ public class KryoListener
         goToMainIntent = new Intent(currentActivity, MainActivity.class);
         goToHomeIntent = new Intent(currentActivity, HomeActivity.class);
         goToChatRoomIntent = new Intent(currentActivity, ChatRoomActivity.class);
-        goToConfirmAccountIntent = new Intent(currentActivity, ConfirmAccountActivity.class);
+        goToConfirmAccountIntent = new Intent(currentActivity, LoginRegisterActivity.class);
 
         listener = new Listener()
         {
@@ -93,7 +93,8 @@ public class KryoListener
                         }
                         case CONFIRMATION_CODE_SUCCESS:
                         {
-                            currentActivity.startActivity(goToLoginIntent);
+                            goToHomeIntent.putExtra(Constants.EMAIL, ConfirmFragment.userEmail);
+                            currentActivity.startActivity(goToHomeIntent);
                             break;
                         }
                         case CONFIRMATION_CODE_FAILED:
@@ -103,7 +104,7 @@ public class KryoListener
                                 @Override
                                 public void run()
                                 {
-                                    ConfirmAccountActivity.tvErrorMessage.setText(systemMessage.message);
+                                    ConfirmFragment.showError(systemMessage.message);
                                 }
                             });
                             break;

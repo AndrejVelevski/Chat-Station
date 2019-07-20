@@ -19,4 +19,10 @@
     <string name="submit">SUBMIT</string>
     <string name="back">BACK</string>
     <string name="closebutton">Close Button for Activity</string>
+    <string name="confirm_account">Confirm your registration</string>
+    <string name="confirm_account_info">In order to complete your registration, please type the confirmation code from the email that we have sent to you.</string>
+    <string name="confirm">CONFIRM</string>
+    <string name="confirmationHint">Confirmation Code</string>
+    <string name="confirm_account_resend_info">Have trouble finding the code? No worries! Click below to resend the confirmation code.</string>
+    <string name="confirm_resend">Resend Confirmation Code</string>
 </resources>
