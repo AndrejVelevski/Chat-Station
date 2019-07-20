@@ -218,8 +218,6 @@ public class Main
 			systemMessagePacket.message = "Logged in successfully.";
 			connection.sendTCP(systemMessagePacket);
 			System.out.println(String.format("Logged in user '%s'...", packet.email));
-			ReceiveUserPacket user = db.getUser(packet.email);
-			connectedUsers.put(connection.getID(), new User(connection, user.username));
 		}
 		catch (IncorrectUsernameOrPasswordException e)
 		{
@@ -244,6 +242,7 @@ public class Main
 	private static void requestUser(Connection connection, RequestUserPacket packet)
 	{
 		ReceiveUserPacket user = db.getUser(packet.username_email);
+		connectedUsers.put(connection.getID(), new User(connection, user.username));
 		connection.sendTCP(user);
 	}
 
