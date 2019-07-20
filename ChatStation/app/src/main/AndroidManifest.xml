@@ -15,7 +15,6 @@
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".Activities.FriendsActivity"></activity>
         <activity android:name=".Activities.FriendRequestsActivity" />
-        <activity android:name=".Activities.ConfirmAccountActivity" />
         <activity android:name=".Activities.NavUiMainActivity" />
         <activity android:name=".Activities.HomeActivity" />
         <activity android:name=".Activities.LoginRegisterActivity" />
