@@ -12,18 +12,26 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.mpip.chatstation.Config.Constants;
 import com.mpip.chatstation.Packets.ConfirmUserPacket;
+import com.mpip.chatstation.Packets.FriendRequestPacket;
+import com.mpip.chatstation.Packets.FriendResponsePacket;
 import com.mpip.chatstation.Packets.LoginUserPacket;
 import com.mpip.chatstation.Packets.MessagePacket;
 import com.mpip.chatstation.Networking.ConnectToServerThread;
 import com.mpip.chatstation.Networking.KryoListener;
+import com.mpip.chatstation.Packets.ReceiveFriendRequestsPacket;
+import com.mpip.chatstation.Packets.ReceiveFriendsPacket;
 import com.mpip.chatstation.Packets.ReceiveRandomChatPacket;
 import com.mpip.chatstation.Packets.ReceiveUserPacket;
 import com.mpip.chatstation.Packets.RegisterUserPacket;
+import com.mpip.chatstation.Packets.RequestFriendRequestsPacket;
+import com.mpip.chatstation.Packets.RequestFriendsPacket;
 import com.mpip.chatstation.Packets.RequestRandomChatPacket;
 import com.mpip.chatstation.Packets.RequestUserPacket;
 import com.mpip.chatstation.Packets.ResendCodePacket;
 import com.mpip.chatstation.Packets.SystemMessagePacket;
 import com.mpip.chatstation.R;
+
+import java.util.ArrayList;
 
 import static com.mpip.chatstation.Config.Constants.serverIP;
 import static com.mpip.chatstation.Config.Constants.serverPort;
@@ -66,6 +74,14 @@ public class MainActivity extends AppCompatActivity
             kryo.register(ReceiveRandomChatPacket.class);
             kryo.register(MessagePacket.Type.class);
             kryo.register(MessagePacket.class);
+            kryo.register(FriendRequestPacket.class);
+            kryo.register(FriendResponsePacket.Type.class);
+            kryo.register(FriendResponsePacket.class);
+            kryo.register(String[].class);
+            kryo.register(RequestFriendRequestsPacket.class);
+            kryo.register(ReceiveFriendRequestsPacket.class);
+            kryo.register(RequestFriendsPacket.class);
+            kryo.register(ReceiveFriendsPacket.class);
             client.start();
         }
 

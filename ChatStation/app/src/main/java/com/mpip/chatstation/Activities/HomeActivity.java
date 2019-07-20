@@ -3,6 +3,7 @@ package com.mpip.chatstation.Activities;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -12,6 +13,7 @@ import android.widget.TextView;
 
 import com.mpip.chatstation.Config.Constants;
 import com.mpip.chatstation.Models.User;
+import com.mpip.chatstation.Packets.FriendRequestPacket;
 import com.mpip.chatstation.Packets.RequestRandomChatPacket;
 import com.mpip.chatstation.Packets.RequestUserPacket;
 import com.mpip.chatstation.Networking.KryoListener;
@@ -24,7 +26,9 @@ public class HomeActivity extends AppCompatActivity
     public static TextView tvWelcome;
     public static Button btnRandomChat;
     public static Button btnChangeState;
+    public static TextView tvMessage;
     private static EditText etTags;
+    private static EditText etFriendUsername;
     private static SeekBar sbMaxUsers;
 
     public static User user;
@@ -41,7 +45,9 @@ public class HomeActivity extends AppCompatActivity
         tvWelcome = findViewById(R.id.tvHomeWelcome);
         btnRandomChat = findViewById(R.id.btnHomeRandomChat);
         btnChangeState = findViewById(R.id.btnHomeChangeState);
+        tvMessage = findViewById(R.id.tvHomeMessage);
         etTags = findViewById(R.id.etHomeTags);
+        etFriendUsername = findViewById(R.id.etHomeFriendUsername);
         sbMaxUsers = findViewById(R.id.sbHomeMaxUsers);
 
         user = new User();
@@ -134,7 +140,44 @@ public class HomeActivity extends AppCompatActivity
                 break;
             }
         }
-
     }
 
+    public void sendFriendRequest(View view)
+    {
+        FriendRequestPacket packet = new FriendRequestPacket();
+        packet.user_from = user.username;
+        packet.user_to = etFriendUsername.getText().toString();
+
+        boolean error = false;
+
+        if (packet.user_to.trim().length() == 0)
+        {
+            error = true;
+            tvMessage.setTextColor(Color.rgb(255,0,0));
+            tvMessage.setText("Username can't be empty.");
+        }
+        if (packet.user_from.equals(packet.user_to))
+        {
+            error = true;
+            tvMessage.setTextColor(Color.rgb(255,0,0));
+            tvMessage.setText("You can't send a friend request to yourself.");
+        }
+
+        if (!error)
+        {
+            new SendPacketThread(packet).start();
+        }
+    }
+
+    public void friendRequests(View view)
+    {
+        Intent intent = new Intent(this, FriendRequestsActivity.class);
+        startActivity(intent);
+    }
+
+    public void friends(View view)
+    {
+        Intent intent = new Intent(this, FriendsActivity.class);
+        startActivity(intent);
+    }
 }

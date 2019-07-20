@@ -1,6 +1,7 @@
 package com.mpip.chatstation.Networking;
 
 import android.content.Intent;
+import android.graphics.Color;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -8,6 +9,8 @@ import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.mpip.chatstation.Activities.ChatRoomActivity;
 import com.mpip.chatstation.Activities.ConfirmAccountActivity;
+import com.mpip.chatstation.Activities.FriendRequestsActivity;
+import com.mpip.chatstation.Activities.FriendsActivity;
 import com.mpip.chatstation.Activities.HomeActivity;
 import com.mpip.chatstation.Activities.MainActivity;
 import com.mpip.chatstation.Config.Constants;
@@ -16,9 +19,15 @@ import com.mpip.chatstation.Fragments.LoginFragment;
 import com.mpip.chatstation.Fragments.SignUpFragment;
 import com.mpip.chatstation.Models.ChatMessage;
 import com.mpip.chatstation.Packets.MessagePacket;
+import com.mpip.chatstation.Packets.ReceiveFriendRequestsPacket;
+import com.mpip.chatstation.Packets.ReceiveFriendsPacket;
 import com.mpip.chatstation.Packets.ReceiveRandomChatPacket;
 import com.mpip.chatstation.Packets.ReceiveUserPacket;
 import com.mpip.chatstation.Packets.SystemMessagePacket;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class KryoListener
 {
@@ -108,6 +117,32 @@ public class KryoListener
                             });
                             break;
                         }
+                        case FRIEND_REQUEST_SUCCESS:
+                        {
+                            currentActivity.runOnUiThread(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    HomeActivity.tvMessage.setTextColor(Color.rgb(0,255,0));
+                                    HomeActivity.tvMessage.setText(systemMessage.message);
+                                }
+                            });
+                            break;
+                        }
+                        case FRIEND_REQUEST_FAILED:
+                        {
+                            currentActivity.runOnUiThread(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    HomeActivity.tvMessage.setTextColor(Color.rgb(255,0,0));
+                                    HomeActivity.tvMessage.setText(systemMessage.message);
+                                }
+                            });
+                            break;
+                        }
                         case SERVER_CLOSED:
                         {
                             goToMainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
@@ -185,6 +220,39 @@ public class KryoListener
                             ChatRoomActivity.messageAdapter.add(new ChatMessage(packet.message,packet.username,belongsToMe, packet.date, packet.type));
                             //notifyDataSetChanged();
                             ChatRoomActivity.lvMessageBox.setSelection(ChatRoomActivity.lvMessageBox.getCount() - 1);
+                        }
+                    });
+                }
+                else if (object instanceof ReceiveFriendRequestsPacket)
+                {
+                    ReceiveFriendRequestsPacket packet = (ReceiveFriendRequestsPacket)object;
+
+                    currentActivity.runOnUiThread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            FriendRequestsActivity.friendRequestsAdapter.updateData(Arrays.asList(packet.usernames));
+                        }
+                    });
+                }
+                else if (object instanceof ReceiveFriendsPacket)
+                {
+                    ReceiveFriendsPacket packet = (ReceiveFriendsPacket)object;
+
+                    StringBuilder sb = new StringBuilder();
+
+                    for (String username : packet.usernames)
+                    {
+                        sb.append(String.format("%s\n", username));
+                    }
+
+                    currentActivity.runOnUiThread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            FriendsActivity.tvFriends.setText(sb.toString());
                         }
                     });
                 }

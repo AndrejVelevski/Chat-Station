@@ -4,18 +4,28 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
 import Config.ConfigConstants;
 import Exceptions.AccountNotConfirmedException;
+import Exceptions.AlreadyFriendsException;
 import Exceptions.EmailAlreadyExistsException;
+import Exceptions.FriendRequestPendingException;
 import Exceptions.IncorrectConfirmationCodeException;
 import Exceptions.IncorrectUsernameOrPasswordException;
 import Exceptions.UsernameAlreadyExistsException;
+import Exceptions.UsernameDoesntExistException;
+import Packets.FriendRequestPacket;
+import Packets.FriendResponsePacket;
 import Packets.LoginUserPacket;
+import Packets.ReceiveFriendRequestsPacket;
+import Packets.ReceiveFriendsPacket;
 import Packets.ReceiveUserPacket;
 import Packets.RegisterUserPacket;
+import Packets.RequestFriendsPacket;
 
 public class Database
 {
@@ -99,11 +109,11 @@ public class Database
 		sql =
 		  "CREATE TABLE friends"
 		+ "("
-		+ "user1 INT NOT NULL,"
-		+ "user2 INT NOT NULL,"
+		+ "user1 VARCHAR(50) NOT NULL,"
+		+ "user2 VARCHAR(50) NOT NULL,"
 		+ "PRIMARY KEY (user1, user2),"
-		+ "FOREIGN KEY (user1) REFERENCES user(id),"
-		+ "FOREIGN KEY (user2) REFERENCES user(id)"
+		+ "FOREIGN KEY (user1) REFERENCES user(username),"
+		+ "FOREIGN KEY (user2) REFERENCES user(username)"
 		+ ")";
 		createTable("friends", sql);
 		
@@ -121,10 +131,10 @@ public class Database
 		+ "("
 		+ "id INT AUTO_INCREMENT,"
 		+ "room INT NOT NULL,"
-		+ "user INT NOT NULL,"
+		+ "user VARCHAR(50) NOT NULL,"
 		+ "PRIMARY KEY (id),"
 		+ "FOREIGN KEY (room) REFERENCES room(id),"
-		+ "FOREIGN KEY (user) REFERENCES user(id)"
+		+ "FOREIGN KEY (user) REFERENCES user(username)"
 		+ ")";
 		createTable("room_members", sql);
 		
@@ -132,15 +142,26 @@ public class Database
 		  "CREATE TABLE messages"
 		+ "("
 		+ "id INT AUTO_INCREMENT,"
-		+ "user INT NOT NULL,"
+		+ "user VARCHAR(50) NOT NULL,"
 		+ "room INT NOT NULL,"
 		+ "message VARCHAR(1000) NOT NULL,"
 		+ "date DATETIME NOT NULL,"
 		+ "PRIMARY KEY (id),"
-		+ "FOREIGN KEY (user) REFERENCES user(id),"
+		+ "FOREIGN KEY (user) REFERENCES user(username),"
 		+ "FOREIGN KEY (room) REFERENCES room(id)"
 		+ ")";
 		createTable("messages", sql);
+		
+		sql =
+	      "CREATE TABLE friend_requests"
+	    + "("
+	    + "user_from VARCHAR(50) NOT NULL,"
+	    + "user_to VARCHAR(50) NOT NULL,"
+	    + "PRIMARY KEY (user_from, user_to),"
+	    + "FOREIGN KEY (user_from) REFERENCES user(username),"
+	    + "FOREIGN KEY (user_to) REFERENCES user(username)"
+	    + ")";
+	    createTable("friend_requests", sql);
 	}
 	
 	private void createTable(String name, String sql)
@@ -161,7 +182,6 @@ public class Database
 	{
 		String sql;
 		
-		//Check if email already exists
 		sql = 
 		String.format(
 		  "SELECT * FROM user "
@@ -175,7 +195,6 @@ public class Database
 				throw new EmailAlreadyExistsException(String.format("Email %s already exists.", user.email));
 		} catch (SQLException e) {e.printStackTrace();}
 		
-		//Check if username already exists
 		sql = 
 		String.format(
 		  "SELECT * FROM user "
@@ -189,7 +208,6 @@ public class Database
 				throw new UsernameAlreadyExistsException(String.format("Username %s already exists.", user.username));
 		} catch (SQLException e) {e.printStackTrace();}
 		
-		//Add user to database
 		sql =
 		String.format(
 		  "INSERT INTO user(username, email, password, first_name, last_name, age, confirmed, registered_on) "
@@ -315,9 +333,181 @@ public class Database
 		return user;
 	}
 	
+	public void sendFriendRequest(FriendRequestPacket packet) throws UsernameDoesntExistException, FriendRequestPendingException, AlreadyFriendsException
+	{
+		String sql;
+		ResultSet rs;
+		
+		try 
+		{
+			sql = 
+				String.format(
+				  "SELECT * FROM user "
+				+ "WHERE username = '%s';",
+				packet.user_to);
+			rs = statement.executeQuery(sql);
+			rs.last();
+			if (rs.getRow() == 0)
+				throw new UsernameDoesntExistException(String.format("Username %s doesn't exist.", packet.user_to));
+			
+			sql = 
+			String.format(
+			  "SELECT * FROM friends "
+			+ "WHERE user1 = '%s' AND user2 = '%s';",
+			packet.user_from, packet.user_to);
+			rs = statement.executeQuery(sql);
+			rs.last();
+			if (rs.getRow() > 0)
+				throw new AlreadyFriendsException(String.format("You are already friends with %s.", packet.user_to));
+			
+			sql = 
+				String.format(
+				  "SELECT * FROM friend_requests "
+				+ "WHERE user_from = '%s' AND user_to = '%s';",
+				packet.user_from, packet.user_to);
+			rs = statement.executeQuery(sql);
+			rs.last();
+			if (rs.getRow() > 0)
+				throw new FriendRequestPendingException(String.format("Username %s already has a pending friend request.", packet.user_to));
+			
+			sql = 
+				String.format(
+				  "SELECT * FROM friend_requests "
+				+ "WHERE user_from = '%s' AND user_to = '%s';",
+				packet.user_to, packet.user_from);
+			rs = statement.executeQuery(sql);
+			rs.last();
+			if (rs.getRow() > 0)
+				throw new FriendRequestPendingException(String.format("You already have a pending friend request from %s.", packet.user_to));
+			
+			sql = 
+				String.format(
+				  "INSERT INTO friend_requests "
+				+ "VALUES('%s', '%s');",
+				packet.user_from, packet.user_to);
+			statement.execute(sql);
+			
+		} catch (SQLException e) {e.printStackTrace();}
+	}
+	
+	public void respondToFriendRequest(FriendResponsePacket packet)
+	{
+		String sql;
+		
+		if (packet.type == FriendResponsePacket.Type.ACCEPT)
+		{
+			try
+			{
+				sql = 
+				String.format(
+				  "INSERT INTO friends "
+				+ "VALUES('%s', '%s');",
+				packet.user_from, packet.user_to);
+				statement.execute(sql);
+				
+				sql = 
+				String.format(
+				  "DELETE FROM friend_requests "
+				+ "WHERE user_from = '%s' AND user_to = '%s';",
+				packet.user_from, packet.user_to);
+				statement.execute(sql);
+			}
+			catch (SQLException e) {e.printStackTrace();}
+		}
+		else
+		{
+			try
+			{
+				sql = 
+				String.format(
+				  "DELETE FROM friend_requests "
+				+ "WHERE user_from = '%s' AND user_to = '%s';",
+				packet.user_from, packet.user_to);
+				statement.execute(sql);
+			} catch (SQLException e) {e.printStackTrace();}
+		}
+	}
+
+	public ReceiveFriendRequestsPacket getFriendRequests(String username)
+	{
+		ReceiveFriendRequestsPacket packet = new ReceiveFriendRequestsPacket();
+		
+		String sql = 
+		String.format(
+		  "SELECT * FROM friend_requests "
+		+ "WHERE user_to = '%s';",
+		username);
+		
+		String[] usernames = null;
+		
+		ResultSet rs;
+		try 
+		{
+			rs = statement.executeQuery(sql);
+			
+			rs.last();
+			usernames = new String[rs.getRow()];
+			rs.beforeFirst();
+			
+			int i=0;
+			while (rs.next())
+			{
+				usernames[i++] = (String.format("%s", rs.getString("user_from")));
+			}
+		} catch (SQLException e) {e.printStackTrace();}
+		
+		packet.usernames = usernames;
+		
+		return packet;
+	}
+
+	public ReceiveFriendsPacket getFriends(String username)
+	{
+		String sql;
+		
+		ReceiveFriendsPacket packet = new ReceiveFriendsPacket();
+		
+		String[] usernames = null;
+		
+		sql = 
+		String.format(
+		  "SELECT * FROM friends "
+		+ "WHERE user1 = '%s' OR user2 = '%s';",
+		username, username);
+		
+		try
+		{
+			ResultSet rs = statement.executeQuery(sql);
+			rs.last();
+			usernames = new String[rs.getRow()];
+			rs.beforeFirst();
+			
+			int i=0;
+			while(rs.next())
+			{
+				if (rs.getString("user1").equals(username))
+				{
+					usernames[i++] = rs.getString("user2");
+				}
+				else
+				{
+					usernames[i++] = rs.getString("user1");
+				}
+				
+			}
+			
+		} catch (SQLException e) {e.printStackTrace();}
+		
+		packet.usernames = usernames;
+		
+		return packet;
+	}
+	
 	private String generateConfirmationCode(int length)
 	{
 		return new Random().ints((int)'0',(int)'Z'+1).filter(i-> (i<=(int)'9' || i>=(int)'A'))
                 .mapToObj(i -> String.valueOf((char)i)).limit(length).collect(Collectors.joining());
 	}
+
+	
 }

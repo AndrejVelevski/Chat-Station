@@ -3,8 +3,6 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -17,13 +15,15 @@ import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Server;
-import com.mysql.cj.x.protobuf.MysqlxDatatypes.Array;
 
 import Exceptions.AccountNotConfirmedException;
+import Exceptions.AlreadyFriendsException;
 import Exceptions.EmailAlreadyExistsException;
+import Exceptions.FriendRequestPendingException;
 import Exceptions.IncorrectConfirmationCodeException;
 import Exceptions.IncorrectUsernameOrPasswordException;
 import Exceptions.UsernameAlreadyExistsException;
+import Exceptions.UsernameDoesntExistException;
 import Models.ChatRoom;
 import Models.User;
 import Packets.*;
@@ -53,6 +53,14 @@ public class Main
         kryo.register(ReceiveRandomChatPacket.class);
         kryo.register(MessagePacket.Type.class);
         kryo.register(MessagePacket.class);
+        kryo.register(FriendRequestPacket.class);
+        kryo.register(FriendResponsePacket.Type.class);
+        kryo.register(FriendResponsePacket.class);
+        kryo.register(String[].class);
+        kryo.register(RequestFriendRequestsPacket.class);
+        kryo.register(ReceiveFriendRequestsPacket.class);
+        kryo.register(RequestFriendsPacket.class);
+        kryo.register(ReceiveFriendsPacket.class);
 	    
 	    db = new Database("chatstation");
 	    connectedUsers = new HashMap<Integer, User>();
@@ -114,7 +122,26 @@ public class Main
 	        		MessagePacket packet = (MessagePacket)object;
 	        		sendMessage(connection, packet);
 	        	}
-	        	
+	        	else if (object instanceof FriendRequestPacket)
+	        	{
+	        		FriendRequestPacket packet = (FriendRequestPacket)object;
+	        		sendFriendRequest(connection, packet);
+	        	}
+	        	else if (object instanceof FriendResponsePacket)
+	        	{
+	        		FriendResponsePacket packet = (FriendResponsePacket)object;
+	        		respondToFriendRequest(packet);
+	        	}
+	        	else if (object instanceof RequestFriendRequestsPacket)
+	        	{
+	        		RequestFriendRequestsPacket packet = (RequestFriendRequestsPacket)object;
+	        		getFriendRequests(connection, packet);
+	        	}
+	        	else if (object instanceof RequestFriendsPacket)
+	        	{
+	        		RequestFriendsPacket packet = (RequestFriendsPacket)object;
+	        		getFriends(connection, packet);
+	        	}
 	        }
 	     });
 	    
@@ -255,11 +282,7 @@ public class Main
 								 .filter(t -> t.length() > 0)
 								 .collect(Collectors.toCollection(HashSet::new));
 		
-		System.out.println(String.format("%d: %s", tags.size(), ChatRoom.getTags(tags)));
-		
-		boolean anyRoomSize = packet.maxUsers<2 ? true:false;
-		
-		System.out.println(anyRoomSize + " " + packet.maxUsers.toString());
+		boolean anyRoomSize = packet.maxUsers<2;
 		
 		if (tags.size() == 0)
 		{
@@ -272,32 +295,12 @@ public class Main
 		}
 		else
 		{
-			/*List<ChatRoom> rooms = chatrooms.stream()
-					.filter(c -> c.maxUsers == packet.maxUsers)
-					.filter(c -> c.users.size() < c.maxUsers)
-					.filter(c -> c.tags.size() > 0)
-					.collect(Collectors.toList());
-					
-			long max = 0;
-			for (ChatRoom c : rooms)
-			{
-				long numMatchingTags = c.tags.stream().filter(tags::contains).count();
-			    if (numMatchingTags > max)
-			    {
-			    	max  = numMatchingTags;
-			    	chatroom = c;
-			    }
-			}
-					*/
-	        
 	        chatroom = chatrooms.stream()
 	        					.filter(c -> c.users.size() < c.maxUsers)
 	        					.filter(c -> anyRoomSize || c.maxUsers == packet.maxUsers)
 	        					.filter(c -> c.tags.size() > 0)
 	        					.max((c1, c2) -> {return (int) (c1.tags.stream().filter(tags::contains).count() - c2.tags.stream().filter(tags::contains).count());})
 	        					.orElse(null);
-			 
-			
 		}
 		
 		if (chatroom != null)
@@ -355,5 +358,37 @@ public class Main
 		}
 		
 		chatroom.users.stream().forEach(u -> u.connection.sendTCP(packet));
+	}
+	
+	private static void sendFriendRequest(Connection connection, FriendRequestPacket packet)
+	{
+		try
+		{
+			db.sendFriendRequest(packet);
+			systemMessagePacket.type = SystemMessagePacket.Type.FRIEND_REQUEST_SUCCESS;
+			systemMessagePacket.message = "Friend request sent successfully.";
+		}
+		catch (UsernameDoesntExistException | FriendRequestPendingException | AlreadyFriendsException e)
+		{
+			systemMessagePacket.type = SystemMessagePacket.Type.FRIEND_REQUEST_FAILED;
+			systemMessagePacket.message = e.getMessage();
+		}
+		
+		connection.sendTCP(systemMessagePacket);
+	}
+	
+	private static void respondToFriendRequest(FriendResponsePacket packet)
+	{
+		db.respondToFriendRequest(packet);
+	}
+	
+	private static void getFriendRequests(Connection connection, RequestFriendRequestsPacket packet)
+	{
+		connection.sendTCP(db.getFriendRequests(packet.username));
+	}
+	
+	private static void getFriends(Connection connection, RequestFriendsPacket packet)
+	{
+		connection.sendTCP(db.getFriends(packet.username));
 	}
 }
