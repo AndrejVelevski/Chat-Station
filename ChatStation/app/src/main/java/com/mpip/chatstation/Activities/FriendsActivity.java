@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
 
+import com.mpip.chatstation.Models.User;
 import com.mpip.chatstation.Networking.KryoListener;
 import com.mpip.chatstation.Networking.SendPacketThread;
 import com.mpip.chatstation.Packets.RequestFriendsPacket;
@@ -24,7 +25,7 @@ public class FriendsActivity extends AppCompatActivity
         tvFriends = findViewById(R.id.tvFriendsFriends);
 
         RequestFriendsPacket packet = new RequestFriendsPacket();
-        packet.username = HomeActivity.user.username;
+        packet.username = User.username;
 
         new SendPacketThread(packet).start();
     }

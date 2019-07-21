@@ -203,7 +203,6 @@ public class LoginFragment extends Fragment implements OnClickListener {
             userEmail = getEmailId;
             new SendPacketThread(packet).start();
         }
-
     }
 
     public static void showError(String msg){

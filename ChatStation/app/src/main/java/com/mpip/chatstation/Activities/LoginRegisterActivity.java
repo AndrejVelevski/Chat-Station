@@ -45,7 +45,7 @@ public class LoginRegisterActivity extends AppCompatActivity {
             }
 
         }
-        else if (savedInstanceState == null) {
+        else  {
             // If savedinstnacestate is null then replace login fragment
 
             fragmentManager

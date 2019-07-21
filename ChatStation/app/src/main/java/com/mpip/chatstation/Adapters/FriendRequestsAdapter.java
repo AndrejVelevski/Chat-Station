@@ -9,6 +9,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.mpip.chatstation.Activities.HomeActivity;
+import com.mpip.chatstation.Models.User;
 import com.mpip.chatstation.Networking.SendPacketThread;
 import com.mpip.chatstation.Packets.FriendResponsePacket;
 import com.mpip.chatstation.R;
@@ -37,7 +38,7 @@ public class FriendRequestsAdapter extends RecyclerView.Adapter<FriendRequestsAd
                 FriendResponsePacket packet = new FriendResponsePacket();
                 packet.type = FriendResponsePacket.Type.ACCEPT;
                 packet.user_from = tvUsername.getText().toString();
-                packet.user_to = HomeActivity.user.username;
+                packet.user_to = User.username;
 
                 new SendPacketThread(packet).start();
 
@@ -50,7 +51,7 @@ public class FriendRequestsAdapter extends RecyclerView.Adapter<FriendRequestsAd
                 FriendResponsePacket packet = new FriendResponsePacket();
                 packet.type = FriendResponsePacket.Type.DECLINE;
                 packet.user_from = tvUsername.getText().toString();
-                packet.user_to = HomeActivity.user.username;
+                packet.user_to = User.username;
 
                 new SendPacketThread(packet).start();
 

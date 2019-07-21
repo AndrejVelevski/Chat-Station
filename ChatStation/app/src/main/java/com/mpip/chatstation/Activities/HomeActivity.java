@@ -31,8 +31,6 @@ public class HomeActivity extends AppCompatActivity
     private static EditText etFriendUsername;
     private static SeekBar sbMaxUsers;
 
-    public static User user;
-
     private int state = 0;
 
     @Override
@@ -50,12 +48,16 @@ public class HomeActivity extends AppCompatActivity
         etFriendUsername = findViewById(R.id.etHomeFriendUsername);
         sbMaxUsers = findViewById(R.id.sbHomeMaxUsers);
 
-        user = new User();
-        user.email = getIntent().getStringExtra(Constants.EMAIL);
-
-        RequestUserPacket packet = new RequestUserPacket();
-        packet.username_email = user.email;
-        new SendPacketThread(packet).start();
+        if (User.email == null)
+        {
+            RequestUserPacket packet = new RequestUserPacket();
+            packet.username_email = getIntent().getStringExtra(Constants.EMAIL);
+            new SendPacketThread(packet).start();
+        }
+        else
+        {
+            updateInfo();
+        }
 
         sbMaxUsers.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener()
         {
@@ -77,12 +79,28 @@ public class HomeActivity extends AppCompatActivity
         });
     }
 
+    public static void updateInfo()
+    {
+        String txt = String.format(
+                        "Welcome %s.\n" +
+                        "Email: %s\n" +
+                        "First name: %s\n" +
+                        "Last name: %s\n" +
+                        "Age: %d\n" +
+                        "Registered on: %s\n" +
+                        "Last login: %s",
+                User.username, User. email, User.first_name, User.last_name,
+                User.age, User.registered_on, User.last_login);
+
+        tvWelcome.setText(txt);
+    }
+
     @Override
     public void onBackPressed()
     {
         SystemMessagePacket packet = new SystemMessagePacket();
         packet.type = SystemMessagePacket.Type.LOGOUT;
-        packet.message = String.format("User %s logged out.", user.email);
+        packet.message = String.format("User %s logged out.", User.username);
         new SendPacketThread(packet).start();
         finish();
     }
@@ -145,7 +163,7 @@ public class HomeActivity extends AppCompatActivity
     public void sendFriendRequest(View view)
     {
         FriendRequestPacket packet = new FriendRequestPacket();
-        packet.user_from = user.username;
+        packet.user_from = User.username;
         packet.user_to = etFriendUsername.getText().toString();
 
         boolean error = false;

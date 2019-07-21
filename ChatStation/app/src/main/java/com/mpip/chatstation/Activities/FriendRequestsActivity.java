@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.os.Bundle;
 
 import com.mpip.chatstation.Adapters.FriendRequestsAdapter;
+import com.mpip.chatstation.Models.User;
 import com.mpip.chatstation.Networking.KryoListener;
 import com.mpip.chatstation.Networking.SendPacketThread;
 import com.mpip.chatstation.Packets.RequestFriendRequestsPacket;
@@ -35,7 +36,7 @@ public class FriendRequestsActivity extends AppCompatActivity
         rvFriendRequests.setAdapter(friendRequestsAdapter);
 
         RequestFriendRequestsPacket packet = new RequestFriendRequestsPacket();
-        packet.username = HomeActivity.user.username;
+        packet.username = User.username;
         new SendPacketThread(packet).start();
     }
 }

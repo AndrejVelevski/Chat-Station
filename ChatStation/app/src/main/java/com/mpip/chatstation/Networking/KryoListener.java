@@ -18,6 +18,7 @@ import com.mpip.chatstation.Fragments.ConfirmFragment;
 import com.mpip.chatstation.Fragments.LoginFragment;
 import com.mpip.chatstation.Fragments.SignUpFragment;
 import com.mpip.chatstation.Models.ChatMessage;
+import com.mpip.chatstation.Models.User;
 import com.mpip.chatstation.Packets.MessagePacket;
 import com.mpip.chatstation.Packets.ReceiveFriendRequestsPacket;
 import com.mpip.chatstation.Packets.ReceiveFriendsPacket;
@@ -35,7 +36,6 @@ public class KryoListener
     public static AppCompatActivity currentActivity;
     private static Intent goToMainIntent;
     private static Intent goToHomeIntent;
-    private static Intent goToLoginIntent;
     private static Intent goToChatRoomIntent;
     private static Intent goToConfirmAccountIntent;
 
@@ -69,7 +69,6 @@ public class KryoListener
                                 @Override
                                 public void run()
                                 {
-                                   // SignUpFragment.signUpTitle.setText(systemMessage.message);
                                     SignUpFragment.showError(systemMessage.message);
                                 }
                             });
@@ -88,7 +87,6 @@ public class KryoListener
                                 @Override
                                 public void run()
                                 {
-                                    //LoginFragment.loginTV.setText(systemMessage.message);
                                     LoginFragment.showError(systemMessage.message);
                                 }
                             });
@@ -102,8 +100,7 @@ public class KryoListener
                         }
                         case CONFIRMATION_CODE_SUCCESS:
                         {
-                            goToHomeIntent.putExtra(Constants.EMAIL, ConfirmFragment.userEmail);
-                            currentActivity.startActivity(goToHomeIntent);
+                            currentActivity.startActivity(goToConfirmAccountIntent);
                             break;
                         }
                         case CONFIRMATION_CODE_FAILED:
@@ -156,32 +153,15 @@ public class KryoListener
                 {
                     ReceiveUserPacket packet = (ReceiveUserPacket)object;
 
-                    HomeActivity.user.email = packet.email;
-                    HomeActivity.user.username = packet.username;
-                    HomeActivity.user.first_name = packet.first_name;
-                    HomeActivity.user.last_name = packet.last_name;
-                    HomeActivity.user.age = packet.age;
-                    HomeActivity.user.registered_on = packet.registered_on;
-                    HomeActivity.user.last_login = packet.last_login;
+                    User.email = packet.email;
+                    User.username = packet.username;
+                    User.first_name = packet.first_name;
+                    User.last_name = packet.last_name;
+                    User.age = packet.age;
+                    User.registered_on = packet.registered_on;
+                    User.last_login = packet.last_login;
 
-                    String txt = String.format(
-                                    "Welcome %s.\n" +
-                                    "Email: %s\n" +
-                                    "First name: %s\n" +
-                                    "Last name: %s\n" +
-                                    "Age: %d\n" +
-                                    "Registered on: %s\n" +
-                                    "Last login: %s",
-                            packet.username, packet. email, packet.first_name, packet.last_name,
-                            packet.age, packet.registered_on, packet.last_login);
-                    currentActivity.runOnUiThread(new Runnable()
-                    {
-                        @Override
-                        public void run()
-                        {
-                            HomeActivity.tvWelcome.setText(txt);
-                        }
-                    });
+                    HomeActivity.updateInfo();
                 }
                 else if (object instanceof ReceiveRandomChatPacket)
                 {
@@ -216,10 +196,8 @@ public class KryoListener
                         @Override
                         public void run()
                         {
-                            boolean belongsToMe = false;
-                            if(packet.username.equals(HomeActivity.user.username)) belongsToMe = true;
+                            boolean belongsToMe = packet.username.equals(User.username);
                             ChatRoomActivity.messageAdapter.add(new ChatMessage(packet.message,packet.username,belongsToMe, packet.date, packet.type));
-                            //notifyDataSetChanged();
                             ChatRoomActivity.lvMessageBox.setSelection(ChatRoomActivity.lvMessageBox.getCount() - 1);
                         }
                     });

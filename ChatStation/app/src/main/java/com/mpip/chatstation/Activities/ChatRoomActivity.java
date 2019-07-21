@@ -10,6 +10,7 @@ import android.widget.ListView;
 
 import com.mpip.chatstation.Adapters.ChatMessageAdapter;
 import com.mpip.chatstation.Config.Constants;
+import com.mpip.chatstation.Models.User;
 import com.mpip.chatstation.Networking.SendPacketThread;
 import com.mpip.chatstation.Packets.MessagePacket;
 import com.mpip.chatstation.R;
@@ -36,19 +37,19 @@ public class ChatRoomActivity extends AppCompatActivity
         lvMessageBox.setAdapter(messageAdapter);
 
         message = new MessagePacket();
-        message.username = HomeActivity.user.username;
+        message.username = User.username;
 
         message.type = MessagePacket.Type.TOSELF;
         message.message = getIntent().getStringExtra(Constants.MESSAGE);
         new SendPacketThread(message).start();
 
         MessagePacket tmp = new MessagePacket();
-        tmp.username = HomeActivity.user.username;
+        tmp.username = User.username;
         tmp.type = MessagePacket.Type.JOIN;
-        tmp.message = String.format("User %s has entered the chat.", HomeActivity.user.username);
+        tmp.message = String.format("User %s has entered the chat.", User.username);
         if (getIntent().getStringExtra(Constants.ROOM_TAGS).length() > 0)
         {
-            tmp.message += String.format("\n%s likes: %s", HomeActivity.user.username, getIntent().getStringExtra(Constants.MATCHING_TAGS));
+            tmp.message += String.format("\n%s likes: %s", User.username, getIntent().getStringExtra(Constants.MATCHING_TAGS));
         }
         new SendPacketThread(tmp).start();
     }
@@ -57,7 +58,7 @@ public class ChatRoomActivity extends AppCompatActivity
     public void onBackPressed()
     {
         message.type = MessagePacket.Type.LEAVE;
-        message.message = String.format("User %s has left the chat.", HomeActivity.user.username);
+        message.message = String.format("User %s has left the chat.", User.username);
         new SendPacketThread(message).start();
         finish();
     }

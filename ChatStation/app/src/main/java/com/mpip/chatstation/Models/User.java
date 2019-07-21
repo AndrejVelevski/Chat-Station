@@ -1,12 +1,14 @@
 package com.mpip.chatstation.Models;
 
+import java.util.List;
+
 public class User
 {
-    public String email;
-    public String username;
-    public String first_name;
-    public String last_name;
-    public Integer age;
-    public String registered_on;
-    public String last_login;
+    public static String email;
+    public static String username;
+    public static String first_name;
+    public static String last_name;
+    public static Integer age;
+    public static String registered_on;
+    public static String last_login;
 }
