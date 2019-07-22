@@ -1,10 +1,15 @@
-<GridLayout
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:columnCount="1"
-    android:background="@color/colorPrimaryDark"
-    >
+    android:id="@+id/svHome">
+    <GridLayout
+
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:columnCount="1"
+        android:background="@color/colorPrimaryDark"
+        >
 
     <TextView
         android:layout_gravity="center_horizontal"
@@ -14,17 +19,19 @@
         android:textColor="@color/white_greyish"
         android:textSize="32sp"
         android:gravity="center"
-        android:layout_marginBottom="25dp"
-        android:layout_marginTop="15dp"/>
+        android:layout_marginBottom="5dp"
+        android:layout_marginTop="5dp"/>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="110dp"
         android:orientation="horizontal"
         android:gravity="center"
-        android:background="@color/background_color">
+        android:background="@color/colorPrimary"
+        android:id="@+id/viewRandomChat">
 
         <TextView
+            android:id="@+id/tvHomeRandomChat"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:drawableTop="@drawable/home_msg_icon"
@@ -44,7 +51,7 @@
         android:layout_height="110dp"
         android:orientation="vertical"
         android:gravity="center"
-        android:background="@color/colorBottomNavigationPrimary">
+        android:background="@color/home_view2">
 
         <TextView
             android:layout_width="wrap_content"
@@ -56,7 +63,7 @@
             android:textSize="14sp" />
 
         <EditText
-            android:id="@+id/etHomeTags"
+            android:id="@+id/etHomeChatTags"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -72,9 +79,10 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="110dp"
+        android:id="@+id/viewMaxUsers"
         android:orientation="vertical"
         android:gravity="center"
-        android:background="@color/home_c1">
+        android:background="@color/colorBottomNavigationPrimary">
 
         <TextView
             android:layout_width="wrap_content"
@@ -89,7 +97,7 @@
             android:textSize="14sp" />
 
         <TextView
-            android:id="@+id/btnHomeChangeState"
+            android:id="@+id/textHomeChangeStateMaxUsers"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="20sp"
@@ -105,7 +113,7 @@
 
 
         <SeekBar
-            android:id="@+id/sbHomeMaxUsers"
+            android:id="@+id/sbHomeMaxUsers2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
@@ -114,34 +122,13 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="110dp"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:background="@color/home_c2">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableTop="@drawable/home_person2"
-            android:shadowColor="#7F000000"
-            android:shadowDx="1"
-            android:shadowDy="1"
-            android:shadowRadius="2"
-            android:text="User's information"
-            android:textAllCaps="true"
-            android:textColor="@color/white"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-    </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="110dp"
         android:orientation="vertical"
         android:gravity="center"
-        android:background="@color/cardview_dark_background">
+        android:background="@color/home_c1">
 
         <TextView
             android:layout_width="wrap_content"
@@ -156,39 +143,64 @@
             android:textSize="20sp"
             android:textStyle="bold" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:layout_marginTop="10dp"
-        android:gravity="center">
-
-
-
-        <EditText
-            android:id="@+id/etHomeFriendUsername"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/username"
-            android:textColorHint="@color/white"
-            android:backgroundTint="@color/colorBottomNavigationActiveColored"
-            android:inputType="textPersonName"
-            android:textAlignment="center"
-            android:textColor="@color/white"
-            android:textStyle="bold"
-           />
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:gravity="center">
 
-        <ImageButton
-            android:id="@+id/btnHomeSendFriendRequest"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="10dp"
-            android:src="@drawable/home_add_friend"
-            android:onClick="sendFriendRequest"
-            android:background="@null"
-            android:text="Send" />
 
+
+            <EditText
+                android:id="@+id/etHomeAddFriend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="8"
+                android:hint="@string/username"
+                android:textColorHint="@color/white"
+                android:backgroundTint="@color/colorBottomNavigationActiveColored"
+                android:inputType="textPersonName"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                />
+
+            <ImageButton
+                android:id="@+id/btnHomeSendFriendRequest2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:src="@drawable/home_add_friend"
+                android:onClick="sendFriendRequest"
+                android:background="@null"
+                android:text="Send" />
+
+        </LinearLayout>
     </LinearLayout>
-    </LinearLayout>
-</GridLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:id="@+id/viewUserInfo"
+            android:background="@color/home_view3">
+
+            <TextView
+                android:id="@+id/btnUserInfo"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableTop="@drawable/home_person2"
+                android:shadowColor="#7F000000"
+                android:shadowDx="1"
+                android:shadowDy="1"
+                android:shadowRadius="2"
+                android:text="User's information"
+                android:textAllCaps="true"
+                android:textColor="@color/white"
+                android:textSize="20sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+    </GridLayout>
+</ScrollView>
