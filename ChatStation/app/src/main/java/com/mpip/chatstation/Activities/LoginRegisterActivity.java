@@ -13,7 +13,7 @@ import com.mpip.chatstation.Fragments.SignUpFragment;
 import com.mpip.chatstation.R;
 
 public class LoginRegisterActivity extends AppCompatActivity {
-    private static FragmentManager fragmentManager;
+    public static FragmentManager fragmentManager;
 
 
     @Override

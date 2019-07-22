@@ -25,6 +25,7 @@ import com.mpip.chatstation.Packets.ReceiveFriendsPacket;
 import com.mpip.chatstation.Packets.ReceiveRandomChatPacket;
 import com.mpip.chatstation.Packets.ReceiveUserPacket;
 import com.mpip.chatstation.Packets.SystemMessagePacket;
+import com.mpip.chatstation.R;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -100,7 +101,11 @@ public class KryoListener
                         }
                         case CONFIRMATION_CODE_SUCCESS:
                         {
-                            currentActivity.startActivity(goToConfirmAccountIntent);
+                            //currentActivity.startActivity(goToConfirmAccountIntent);
+                            LoginRegisterActivity.fragmentManager
+                                    .beginTransaction()
+                                    .replace(R.id.frameContainer, new LoginFragment(),
+                                            Constants.Login_Fragment).commit();
                             break;
                         }
                         case CONFIRMATION_CODE_FAILED:
