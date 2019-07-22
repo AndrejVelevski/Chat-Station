@@ -13,4 +13,6 @@
     <color name="requiredField">#FF0000</color>
     <color name="server_msg">#FF8922</color>
     <color name="to_self_msg">#2196F3</color>
+    <color name="home_c1">#7E57C2</color>
+    <color name="home_c2">#c0392b</color>
 </resources>

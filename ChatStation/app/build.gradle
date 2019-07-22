@@ -33,5 +33,6 @@ dependencies {
     implementation project(path: ':kryonet-2.21-all')
     implementation 'androidx.recyclerview:recyclerview:1.0.0'
     implementation 'com.aurelhubert:ahbottomnavigation:2.3.4'
+    implementation 'androidx.cardview:cardview:1.0.0'
     implementation project(path: ':jbcrypt-0.4')
 }

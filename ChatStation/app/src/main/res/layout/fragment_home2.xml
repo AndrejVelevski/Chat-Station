@@ -1,0 +1,194 @@
+<GridLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:columnCount="1"
+    android:background="@color/colorPrimaryDark"
+    >
+
+    <TextView
+        android:layout_gravity="center_horizontal"
+        android:fontFamily="@font/fascinate_inline"
+        android:text="@string/app_name"
+        android:textAllCaps="true"
+        android:textColor="@color/white_greyish"
+        android:textSize="32sp"
+        android:gravity="center"
+        android:layout_marginBottom="25dp"
+        android:layout_marginTop="15dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="110dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@color/background_color">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@drawable/home_msg_icon"
+            android:shadowColor="#7F000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="2"
+            android:text="Random Chat"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="110dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@color/colorBottomNavigationPrimary">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:text="Enter things that you are interested in, so you get matched with people that have similar interests like you."
+            android:textAlignment="center"
+            android:textColor="#FDF1EAEA"
+            android:textSize="14sp" />
+
+        <EditText
+            android:id="@+id/etHomeTags"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="tag1, tag2, tag3, ..."
+            android:textColorHint="@color/white"
+            android:backgroundTint="@color/colorBottomNavigationActiveColored"
+            android:inputType="textPersonName"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="110dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@color/home_c1">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:text="Tap to change"
+            android:drawableEnd="@drawable/home_tap"
+            android:drawablePadding="5dp"
+            android:textAlignment="center"
+            android:textColor="#FDF1EAEA"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/btnHomeChangeState"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor="@color/white"
+            android:textAllCaps="true"
+            android:onClick="changeState"
+            android:text="Max users: 2"
+            android:shadowColor="#7F000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="2"
+            android:textStyle="bold"/>
+
+
+        <SeekBar
+            android:id="@+id/sbHomeMaxUsers"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="5dp"
+            android:progress="0"
+            android:visibility="visible" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="110dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:background="@color/home_c2">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTop="@drawable/home_person2"
+            android:shadowColor="#7F000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="2"
+            android:text="User's information"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="110dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@color/cardview_dark_background">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:shadowColor="#7F000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="2"
+            android:text="Add friend"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp"
+        android:gravity="center">
+
+
+
+        <EditText
+            android:id="@+id/etHomeFriendUsername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="@string/username"
+            android:textColorHint="@color/white"
+            android:backgroundTint="@color/colorBottomNavigationActiveColored"
+            android:inputType="textPersonName"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textStyle="bold"
+           />
+
+        <ImageButton
+            android:id="@+id/btnHomeSendFriendRequest"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:src="@drawable/home_add_friend"
+            android:onClick="sendFriendRequest"
+            android:background="@null"
+            android:text="Send" />
+
+    </LinearLayout>
+    </LinearLayout>
+</GridLayout>
