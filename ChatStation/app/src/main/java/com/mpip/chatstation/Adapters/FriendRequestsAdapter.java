@@ -29,9 +29,9 @@ public class FriendRequestsAdapter extends RecyclerView.Adapter<FriendRequestsAd
         public FriendRequestsViewHolder(View view)
         {
             super(view);
-            tvUsername = view.findViewById(R.id.tvFriendRequestUsername);
-            btnAccept = view.findViewById(R.id.btnFriendRequestAccept);
-            btnDecline = view.findViewById(R.id.btnFriendRequestDecline);
+            tvUsername = view.findViewById(R.id.tvFriendRequestUsername2);
+            btnAccept = view.findViewById(R.id.btnFriendRequestAccept2);
+            btnDecline = view.findViewById(R.id.btnFriendRequestDecline2);
 
             btnAccept.setOnClickListener(listener ->
             {

@@ -10,20 +10,27 @@ import android.widget.Toast;
 
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigation;
 import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
+import com.mpip.chatstation.Config.Constants;
+import com.mpip.chatstation.Fragments.FriendRequestsFragment;
 import com.mpip.chatstation.Fragments.FriendsFragment;
 import com.mpip.chatstation.Fragments.HomeFragment;
 import com.mpip.chatstation.Fragments.MessagesFragment;
+import com.mpip.chatstation.Models.User;
+import com.mpip.chatstation.Networking.KryoListener;
+import com.mpip.chatstation.Networking.SendPacketThread;
+import com.mpip.chatstation.Packets.RequestUserPacket;
 import com.mpip.chatstation.R;
 
 public class NavUiMainActivity extends AppCompatActivity {
 
     AHBottomNavigation bottomNavigation;
-
+    String userEmail;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_nav_ui_main);
+        KryoListener.currentActivity = this;
 
         bottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_nav);
 
@@ -42,11 +49,17 @@ public class NavUiMainActivity extends AppCompatActivity {
         // Use colored navigation with circle reveal effect
         //bottomNavigation.setColored(true);
 
+        if (User.email == null)
+        {
+            RequestUserPacket packet = new RequestUserPacket();
+            packet.username_email = getIntent().getStringExtra(Constants.EMAIL);
+            new SendPacketThread(packet).start();
+        }
 
 
         //poceten fragment
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
-                new HomeFragment(bottomNavigation)).commit();
+                new HomeFragment()).commit();
 
         bottomNavigation.setOnTabSelectedListener((pos,isSelected)->{
             Toast.makeText(NavUiMainActivity.this, "Start activity: " + pos, Toast.LENGTH_SHORT).show();
@@ -55,14 +68,15 @@ public class NavUiMainActivity extends AppCompatActivity {
 
             switch (pos){
                 case 0:
-                    selectedFragment = new HomeFragment(bottomNavigation);
+                    selectedFragment = new HomeFragment();
                     break;
                 case 1:
-                    selectedFragment = new MessagesFragment();
+                    selectedFragment = new FriendsFragment(bottomNavigation);
                     break;
                 case 2:
-                    selectedFragment = new FriendsFragment();
+                    selectedFragment = new FriendRequestsFragment();
                     break;
+
             }
 
             if(selectedFragment!=null){

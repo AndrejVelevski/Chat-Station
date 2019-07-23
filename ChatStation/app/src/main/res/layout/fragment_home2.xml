@@ -103,7 +103,6 @@
             android:textSize="20sp"
             android:textColor="@color/white"
             android:textAllCaps="true"
-            android:onClick="changeState"
             android:text="Max users: 2"
             android:shadowColor="#7F000000"
             android:shadowDx="1"
@@ -172,7 +171,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:src="@drawable/home_add_friend"
-                android:onClick="sendFriendRequest"
                 android:background="@null"
                 android:text="Send" />
 

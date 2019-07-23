@@ -20,13 +20,13 @@ public class FriendsActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_friends);
-        KryoListener.currentActivity = this;
-
-        tvFriends = findViewById(R.id.tvFriendsFriends);
-
-        RequestFriendsPacket packet = new RequestFriendsPacket();
-        packet.username = User.username;
-
-        new SendPacketThread(packet).start();
+//        KryoListener.currentActivity = this;
+//
+//        tvFriends = findViewById(R.id.tvFriendsFriends);
+//
+//        RequestFriendsPacket packet = new RequestFriendsPacket();
+//        packet.username = User.username;
+//
+//        new SendPacketThread(packet).start();
     }
 }

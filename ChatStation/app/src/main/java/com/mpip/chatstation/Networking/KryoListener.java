@@ -13,8 +13,11 @@ import com.mpip.chatstation.Activities.FriendsActivity;
 import com.mpip.chatstation.Activities.HomeActivity;
 import com.mpip.chatstation.Activities.LoginRegisterActivity;
 import com.mpip.chatstation.Activities.MainActivity;
+import com.mpip.chatstation.Activities.NavUiMainActivity;
 import com.mpip.chatstation.Config.Constants;
 import com.mpip.chatstation.Fragments.ConfirmFragment;
+import com.mpip.chatstation.Fragments.FriendRequestsFragment;
+import com.mpip.chatstation.Fragments.HomeFragment;
 import com.mpip.chatstation.Fragments.LoginFragment;
 import com.mpip.chatstation.Fragments.SignUpFragment;
 import com.mpip.chatstation.Models.ChatMessage;
@@ -39,6 +42,7 @@ public class KryoListener
     private static Intent goToHomeIntent;
     private static Intent goToChatRoomIntent;
     private static Intent goToConfirmAccountIntent;
+    private static Intent goToNAVuiIntent;
 
     public static void createListener()
     {
@@ -46,6 +50,7 @@ public class KryoListener
         goToHomeIntent = new Intent(currentActivity, HomeActivity.class);
         goToChatRoomIntent = new Intent(currentActivity, ChatRoomActivity.class);
         goToConfirmAccountIntent = new Intent(currentActivity, LoginRegisterActivity.class);
+        goToNAVuiIntent = new Intent(currentActivity, NavUiMainActivity.class);
 
         listener = new Listener()
         {
@@ -77,8 +82,10 @@ public class KryoListener
                         }
                         case LOGIN_SUCCESS:
                         {
-                            goToHomeIntent.putExtra(Constants.EMAIL, LoginFragment.userEmail);
-                            currentActivity.startActivity(goToHomeIntent);
+//                            goToHomeIntent.putExtra(Constants.EMAIL, LoginFragment.userEmail);
+//                            currentActivity.startActivity(goToHomeIntent);
+                            goToNAVuiIntent.putExtra(Constants.EMAIL, LoginFragment.userEmail);
+                              currentActivity.startActivity(goToNAVuiIntent);
                             break;
                         }
                         case LOGIN_FAILED:
@@ -127,8 +134,9 @@ public class KryoListener
                                 @Override
                                 public void run()
                                 {
-                                    HomeActivity.tvMessage.setTextColor(Color.rgb(0,255,0));
-                                    HomeActivity.tvMessage.setText(systemMessage.message);
+//                                    HomeActivity.tvMessage.setTextColor(Color.rgb(0,255,0));
+//                                    HomeActivity.tvMessage.setText(systemMessage.message);
+                                    HomeFragment.showSuccess(systemMessage.message);
                                 }
                             });
                             break;
@@ -140,8 +148,9 @@ public class KryoListener
                                 @Override
                                 public void run()
                                 {
-                                    HomeActivity.tvMessage.setTextColor(Color.rgb(255,0,0));
-                                    HomeActivity.tvMessage.setText(systemMessage.message);
+//                                    HomeActivity.tvMessage.setTextColor(Color.rgb(255,0,0));
+//                                    HomeActivity.tvMessage.setText(systemMessage.message);
+                                    HomeFragment.showError(systemMessage.message);
                                 }
                             });
                             break;
@@ -166,7 +175,7 @@ public class KryoListener
                     User.registered_on = packet.registered_on;
                     User.last_login = packet.last_login;
 
-                    HomeActivity.updateInfo();
+                    //HomeActivity.updateInfo();
                 }
                 else if (object instanceof ReceiveRandomChatPacket)
                 {
@@ -216,7 +225,7 @@ public class KryoListener
                         @Override
                         public void run()
                         {
-                            FriendRequestsActivity.friendRequestsAdapter.updateData(Arrays.asList(packet.usernames));
+                            FriendRequestsFragment.friendRequestsAdapter.updateData(Arrays.asList(packet.usernames));
                         }
                     });
                 }
