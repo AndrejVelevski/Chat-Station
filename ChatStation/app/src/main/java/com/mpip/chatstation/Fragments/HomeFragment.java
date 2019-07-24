@@ -101,7 +101,6 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     public void onClick(View v) {
         switch (v.getId()) {
             case R.id.viewRandomChat:
-                System.out.println("RANDOM CHAT");
                 randomChat();
                 break;
             case R.id.viewMaxUsers:

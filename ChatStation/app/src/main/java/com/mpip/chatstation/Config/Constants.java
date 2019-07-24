@@ -21,6 +21,6 @@ public class Constants
     public static final String ForgotPassword_Fragment = "ForgotPassword_Fragment";
     public static final String Confirm_Fragment = "Confirm_Fragment";
 
-    public static final String serverIP = "78.157.30.111";
+    public static final String serverIP = "chatstation.redirectme.net";
     public static final int serverPort = 54555;
 }

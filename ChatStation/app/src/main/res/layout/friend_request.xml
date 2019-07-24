@@ -4,22 +4,6 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:layout_gravity="center"
-        android:text="Friend Requests"
-        android:textAlignment="center"
-        android:textSize="20sp"
-        android:textStyle="bold" />
-
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="3px"
-        android:layout_marginTop="5dp"
-        android:background="@color/colorPrimary" />
-
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -28,7 +12,7 @@
 
         <TextView
             android:id="@+id/tvFriendRequestUsername2"
-            android:layout_width="180dp"
+            android:layout_width="170dp"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
             android:text="@string/username"
@@ -39,32 +23,31 @@
             android:id="@+id/btnFriendRequestAccept2"
             android:text="Accept"
             android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            android:layout_width="100dp"
+            android:textSize="15sp"
+            android:layout_width="wrap_content"
             android:layout_height="35dp"
             android:background="@drawable/accept_button"
-            android:shadowColor="#A8A8A8"
-            android:shadowDx="0"
-            android:shadowDy="0"
-            android:shadowRadius="5"
-            android:layout_marginRight="5dp"
-            />
-
-        <Button
-            android:id="@+id/btnFriendRequestDecline2"
-
-            android:text="Decline"
-            android:textColor="#FFFFFF"
-            android:textSize="20sp"
-            android:layout_width="100dp"
-            android:layout_height="35dp"
-            android:background="@drawable/accept_button"
-            android:backgroundTint="@color/home_c2"
             android:shadowColor="#A8A8A8"
             android:shadowDx="0"
             android:shadowDy="0"
             android:shadowRadius="5"
             />
+
+        <Button
+        android:id="@+id/btnFriendRequestDecline2"
+        android:layout_marginLeft="10dp"
+        android:text="Decline"
+        android:textColor="#FFFFFF"
+        android:textSize="15sp"
+        android:layout_width="wrap_content"
+        android:layout_height="35dp"
+        android:background="@drawable/accept_button"
+        android:backgroundTint="@color/home_c2"
+        android:shadowColor="#A8A8A8"
+        android:shadowDx="0"
+        android:shadowDy="0"
+        android:shadowRadius="5"
+        />
 
     </LinearLayout>
 

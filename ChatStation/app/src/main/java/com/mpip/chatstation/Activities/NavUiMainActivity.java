@@ -13,6 +13,7 @@ import com.aurelhubert.ahbottomnavigation.AHBottomNavigationItem;
 import com.mpip.chatstation.Config.Constants;
 import com.mpip.chatstation.Fragments.FriendRequestsFragment;
 import com.mpip.chatstation.Fragments.FriendsFragment;
+import com.mpip.chatstation.Fragments.FriendsListFragment;
 import com.mpip.chatstation.Fragments.HomeFragment;
 import com.mpip.chatstation.Fragments.MessagesFragment;
 import com.mpip.chatstation.Models.User;
@@ -38,10 +39,12 @@ public class NavUiMainActivity extends AppCompatActivity {
         AHBottomNavigationItem item1 = new AHBottomNavigationItem("Home", R.drawable.ic_home_black_24dp, android.R.color.white);
         AHBottomNavigationItem item2 = new AHBottomNavigationItem("Messages", R.drawable.ic_message_black_24dp, android.R.color.white);
         AHBottomNavigationItem item3 = new AHBottomNavigationItem("Friends", R.drawable.ic_people_black_24dp, android.R.color.white);
+        AHBottomNavigationItem item4 = new AHBottomNavigationItem("Friends Requests", R.drawable.ic_people_black_24dp, android.R.color.white);
 
         bottomNavigation.addItem(item1);
         bottomNavigation.addItem(item2);
         bottomNavigation.addItem(item3);
+        bottomNavigation.addItem(item4);
 
         // Set background color
         //bottomNavigation.setDefaultBackgroundColor(Color.parseColor("#009688"));
@@ -56,13 +59,12 @@ public class NavUiMainActivity extends AppCompatActivity {
             new SendPacketThread(packet).start();
         }
 
-
         //poceten fragment
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                 new HomeFragment()).commit();
 
         bottomNavigation.setOnTabSelectedListener((pos,isSelected)->{
-            Toast.makeText(NavUiMainActivity.this, "Start activity: " + pos, Toast.LENGTH_SHORT).show();
+            //Toast.makeText(NavUiMainActivity.this, "Start activity: " + pos, Toast.LENGTH_SHORT).show();
 
             Fragment selectedFragment = null;
 
@@ -74,6 +76,9 @@ public class NavUiMainActivity extends AppCompatActivity {
                     selectedFragment = new FriendsFragment(bottomNavigation);
                     break;
                 case 2:
+                    selectedFragment = new FriendsListFragment();
+                    break;
+                case 3:
                     selectedFragment = new FriendRequestsFragment();
                     break;
 

@@ -13,10 +13,10 @@
 
 
     <Button
-        android:id="@+id/angry_btn"
+        android:id="@+id/btnFriendListPic"
         android:text="IP"
         android:textColor="#FFFFFF"
-        android:textSize="30sp"
+        android:textSize="32sp"
         android:layout_width="70dp"
         android:layout_height="70dp"
         android:background="@drawable/accept_button"
@@ -29,10 +29,11 @@
 
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="230dp"
+        android:layout_width="190dp"
         android:layout_height="match_parent">
 
         <TextView
+            android:id="@+id/friendListFullName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Ime Prezime"
@@ -40,6 +41,7 @@
             android:textStyle="bold" />
 
         <TextView
+            android:id="@+id/friendListUsername"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Username"
@@ -50,7 +52,7 @@
 
 
     <ImageButton
-        android:id="@+id/btnfrinfo"
+        android:id="@+id/btnFriendInfo"
         android:layout_marginTop="10dp"
         android:layout_width="50dp"
         android:layout_height="50dp"

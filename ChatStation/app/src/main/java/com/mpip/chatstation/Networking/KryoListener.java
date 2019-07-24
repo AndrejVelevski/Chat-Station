@@ -1,15 +1,12 @@
 package com.mpip.chatstation.Networking;
 
 import android.content.Intent;
-import android.graphics.Color;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.mpip.chatstation.Activities.ChatRoomActivity;
-import com.mpip.chatstation.Activities.FriendRequestsActivity;
-import com.mpip.chatstation.Activities.FriendsActivity;
 import com.mpip.chatstation.Activities.HomeActivity;
 import com.mpip.chatstation.Activities.LoginRegisterActivity;
 import com.mpip.chatstation.Activities.MainActivity;
@@ -17,6 +14,7 @@ import com.mpip.chatstation.Activities.NavUiMainActivity;
 import com.mpip.chatstation.Config.Constants;
 import com.mpip.chatstation.Fragments.ConfirmFragment;
 import com.mpip.chatstation.Fragments.FriendRequestsFragment;
+import com.mpip.chatstation.Fragments.FriendsListFragment;
 import com.mpip.chatstation.Fragments.HomeFragment;
 import com.mpip.chatstation.Fragments.LoginFragment;
 import com.mpip.chatstation.Fragments.SignUpFragment;
@@ -30,9 +28,7 @@ import com.mpip.chatstation.Packets.ReceiveUserPacket;
 import com.mpip.chatstation.Packets.SystemMessagePacket;
 import com.mpip.chatstation.R;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class KryoListener
 {
@@ -245,7 +241,8 @@ public class KryoListener
                         @Override
                         public void run()
                         {
-                            FriendsActivity.tvFriends.setText(sb.toString());
+                            //FriendsActivity.tvFriends.setText(sb.toString());
+                            FriendsListFragment.friendListAdapter.updateData(Arrays.asList(packet.usernames));
                         }
                     });
                 }
