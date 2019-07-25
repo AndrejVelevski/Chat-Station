@@ -6,6 +6,81 @@
     android:background="@color/white"
     android:id="@+id/svFriendRequests">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="110dp"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:background="@color/background_color">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:shadowColor="#7F000000"
+            android:shadowDx="1"
+            android:shadowDy="1"
+            android:shadowRadius="2"
+            android:text="Add friend"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="10dp"
+            android:gravity="center">
+
+
+
+            <EditText
+                android:id="@+id/etFriendRequestAddFriend"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="8"
+                android:hint="@string/username"
+                android:textColorHint="@color/white"
+                android:backgroundTint="@color/colorBottomNavigationActiveColored"
+                android:inputType="textPersonName"
+                android:textAlignment="center"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                />
+
+            <ImageButton
+                android:id="@+id/btnFriendRequestSendFriendRequest"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="10dp"
+                android:src="@drawable/home_add_friend"
+                android:background="@null"
+                android:text="Send" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:layout_gravity="center"
+        android:text="Friend Requests"
+        android:textAlignment="center"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvFriendRequests2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="3px"
+        android:layout_marginTop="5dp"
+        android:background="@color/cardview_dark_background" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -17,15 +92,10 @@
         android:textSize="20sp"
         android:textStyle="bold" />
 
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="3px"
-        android:layout_marginTop="5dp"
-        android:background="@color/colorPrimary" />
-
-
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvFriendRequests2"
+        android:id="@+id/rvFriendList2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
+
 </LinearLayout>

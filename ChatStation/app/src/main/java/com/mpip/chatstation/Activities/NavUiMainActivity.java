@@ -43,12 +43,12 @@ public class NavUiMainActivity extends AppCompatActivity {
         AHBottomNavigationItem item1 = new AHBottomNavigationItem("Home", R.drawable.ic_home_black_24dp, android.R.color.white);
         AHBottomNavigationItem item2 = new AHBottomNavigationItem("Messages", R.drawable.ic_message_black_24dp, android.R.color.white);
         AHBottomNavigationItem item3 = new AHBottomNavigationItem("Friends", R.drawable.ic_people_black_24dp, android.R.color.white);
-        AHBottomNavigationItem item4 = new AHBottomNavigationItem("Friend Requests", R.drawable.ic_people_black_24dp, android.R.color.white);
+        //AHBottomNavigationItem item4 = new AHBottomNavigationItem("Friend Requests", R.drawable.ic_people_black_24dp, android.R.color.white);
 
         bottomNavigation.addItem(item1);
         bottomNavigation.addItem(item2);
         bottomNavigation.addItem(item3);
-        bottomNavigation.addItem(item4);
+        //bottomNavigation.addItem(item4);
 
         // Set background color
         //bottomNavigation.setDefaultBackgroundColor(Color.parseColor("#009688"));
@@ -73,9 +73,6 @@ public class NavUiMainActivity extends AppCompatActivity {
                     selectedFragment = new FriendsFragment(bottomNavigation);
                     break;
                 case 2:
-                    selectedFragment = new FriendsListFragment();
-                    break;
-                case 3:
                     selectedFragment = new FriendRequestsFragment();
                     break;
 

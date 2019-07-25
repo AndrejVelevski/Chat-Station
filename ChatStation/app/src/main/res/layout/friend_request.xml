@@ -4,6 +4,12 @@
     android:layout_height="wrap_content"
     android:orientation="vertical">
 
+    <View
+        android:layout_width="fill_parent"
+        android:layout_height="3px"
+        android:layout_marginTop="5dp"
+        android:background="@color/colorPrimary" />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -51,9 +57,5 @@
 
     </LinearLayout>
 
-    <View
-        android:layout_width="fill_parent"
-        android:layout_height="3px"
-        android:layout_marginTop="5dp"
-        android:background="@color/colorPrimary" />
+
 </LinearLayout>

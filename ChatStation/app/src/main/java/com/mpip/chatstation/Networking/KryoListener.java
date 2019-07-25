@@ -259,7 +259,7 @@ public class KryoListener
                         @Override
                         public void run()
                         {
-                            FriendsListFragment.friendListAdapter.updateData(users);
+                            FriendRequestsFragment.friendListAdapter.updateData(users);
                         }
                     });
                 }
