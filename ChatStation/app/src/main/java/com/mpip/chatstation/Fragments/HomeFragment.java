@@ -19,6 +19,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
+import com.mpip.chatstation.Activities.NavUiMainActivity;
 import com.mpip.chatstation.Config.Constants;
 import com.mpip.chatstation.Models.User;
 import com.mpip.chatstation.Networking.SendPacketThread;
@@ -173,7 +174,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
     public void sendFriendRequest()
     {
         FriendRequestPacket packet = new FriendRequestPacket();
-        packet.user_from = User.username;
+        packet.user_from = NavUiMainActivity.user.username;
         packet.user_to = etHomeAddFriend.getText().toString();
 
         boolean error = false;

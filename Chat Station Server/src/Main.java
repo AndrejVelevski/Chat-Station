@@ -57,6 +57,8 @@ public class Main
         kryo.register(FriendResponsePacket.Type.class);
         kryo.register(FriendResponsePacket.class);
         kryo.register(String[].class);
+        kryo.register(List.class);
+        kryo.register(ArrayList.class);
         kryo.register(RequestFriendRequestsPacket.class);
         kryo.register(ReceiveFriendRequestsPacket.class);
         kryo.register(RequestFriendsPacket.class);
@@ -217,9 +219,11 @@ public class Main
 			systemMessagePacket.type = SystemMessagePacket.Type.LOGIN_SUCCESS;
 			systemMessagePacket.message = "Logged in successfully.";
 			connection.sendTCP(systemMessagePacket);
-			ReceiveUserPacket user = db.getUser(packet.email);
+			ReceiveUserPacket user = db.getUser(packet.username_email);
 			connectedUsers.put(connection.getID(), new User(connection, user.username));
-			System.out.println(String.format("Logged in user '%s'...", packet.email));
+			user.toSelf = true;
+			connection.sendTCP(user);
+			System.out.println(String.format("Logged in user '%s'...", packet.username_email));
 		}
 		catch (IncorrectUsernameOrPasswordException e)
 		{
@@ -251,7 +255,7 @@ public class Main
 
 	private static void resendCode(Connection connection, ResendCodePacket packet)
 	{
-		ReceiveUserPacket user = db.getUser(packet.email);
+		ReceiveUserPacket user = db.getUser(packet.username_email);
 		db.sendConfirmationCode(user.email, user.username);
 	}
 
@@ -259,7 +263,7 @@ public class Main
 	{
 		try
 		{
-			db.confirmAccount(packet.email, packet.confirm_code.toUpperCase());
+			db.confirmAccount(packet.username_email, packet.confirm_code.toUpperCase());
 			systemMessagePacket.type = SystemMessagePacket.Type.CONFIRMATION_CODE_SUCCESS;
 			systemMessagePacket.message = "Account confirmed successfully.";
 			connection.sendTCP(systemMessagePacket);

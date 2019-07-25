@@ -39,7 +39,8 @@ import java.util.regex.Pattern;
 public class LoginFragment extends Fragment implements OnClickListener {
     private static View view;
 
-    private EditText emailid, password;
+    public static EditText emailid;
+    private static EditText password;
     private Button loginButton;
     private TextView forgotPassword, signUp;
     private CheckBox show_hide_password;
@@ -48,7 +49,6 @@ public class LoginFragment extends Fragment implements OnClickListener {
     private static Animation shakeAnimation;
     private static FragmentManager fragmentManager;
 
-    public static String userEmail;
     private static FragmentActivity context;
 
     public LoginFragment() {
@@ -184,12 +184,12 @@ public class LoginFragment extends Fragment implements OnClickListener {
         }
         // Check if email id is valid or not
         // else if (!m.find())
-        else if (!Pattern.compile(String.valueOf(Patterns.EMAIL_ADDRESS)).matcher(getEmailId).matches()){
+/*        else if (!Pattern.compile(String.valueOf(Patterns.EMAIL_ADDRESS)).matcher(getEmailId).matches()){
 //            loginLayout.startAnimation(shakeAnimation);
 //            new CustomToast().Show_Toast(getActivity(), view,
 //                    "Your Email is Invalid.");
             showError("Your Email is Invalid.");
-        }
+        }*/
             // Else do login and do your stuff
         else{
 //            System.out.println("LOGIN: "+getEmailId + " | " + getPassword);
@@ -197,10 +197,9 @@ public class LoginFragment extends Fragment implements OnClickListener {
 //                    .show();
 
             LoginUserPacket packet = new LoginUserPacket();
-            packet.email = getEmailId;
+            packet.username_email = getEmailId;
             packet.password = BCrypt.hashpw(getPassword, Constants.SALT);
 
-            userEmail = getEmailId;
             new SendPacketThread(packet).start();
         }
     }

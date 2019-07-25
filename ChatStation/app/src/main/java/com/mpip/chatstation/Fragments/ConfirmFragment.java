@@ -116,7 +116,7 @@ public class ConfirmFragment extends Fragment implements OnClickListener {
     private void confirm()
     {
         ConfirmUserPacket packet = new ConfirmUserPacket();
-        packet.email = userEmail;
+        packet.username_email = userEmail;
         packet.confirm_code = etConfirmCode.getText().toString();
 
         new SendPacketThread(packet).start();
@@ -125,7 +125,7 @@ public class ConfirmFragment extends Fragment implements OnClickListener {
     private void resend()
     {
         ResendCodePacket packet = new ResendCodePacket();
-        packet.email = userEmail;
+        packet.username_email = userEmail;
         new SendPacketThread(packet).start();
     }
 

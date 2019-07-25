@@ -2,6 +2,7 @@ package Packets;
 
 public class ReceiveUserPacket
 {
+	public boolean toSelf;
     public String email;
     public String username;
     public String first_name;

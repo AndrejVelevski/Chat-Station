@@ -227,8 +227,8 @@ public class Database
 		sql = 
 		String.format(
 		  "SELECT * FROM user "
-		+ "WHERE (email = '%s' AND password = '%s');",
-		user.email, user.password);
+		+ "WHERE (username = '%s' OR email = '%s') AND password = '%s';",
+		user.username_email, user.username_email, user.password);
 		try 
 		{
 			ResultSet rs = statement.executeQuery(sql);
@@ -237,14 +237,14 @@ public class Database
 			{
 				if (!rs.getBoolean("confirmed"))
 				{
-					throw new AccountNotConfirmedException(String.format("Account %s is not confirmed.", user.email));
+					throw new AccountNotConfirmedException(String.format("Account %s is not confirmed.", user.username_email));
 				}
 				
 				sql = String.format(
 						  "UPDATE user "
 						+ "SET last_login = '%s' "
-						+ "WHERE email = '%s';",
-						LocalDateTime.now(), user.email);
+						+ "WHERE username = '%s' OR email = '%s';",
+						LocalDateTime.now(), user.username_email, user.username_email);
 				
 				statement.execute(sql);
 						
@@ -272,15 +272,15 @@ public class Database
 		} catch (SQLException e) {e.printStackTrace();}
 	}
 	
-	public void confirmAccount(String email, String code) throws IncorrectConfirmationCodeException
+	public void confirmAccount(String username_email, String code) throws IncorrectConfirmationCodeException
 	{
 		String sql;
 		
 		sql = 
 		String.format(
 		  "SELECT * FROM user "
-		+ "WHERE email = '%s';",
-		email);
+		+ "WHERE username = '%s' OR email = '%s';",
+		username_email, username_email);
 		
 		try 
 		{
@@ -292,8 +292,8 @@ public class Database
 				sql = String.format(
 						  "UPDATE user "
 						+ "SET confirmed = %b "
-						+ "WHERE email = '%s';",
-						true, email);
+						+ "WHERE username = '%s' OR email = '%s';",
+						true, username_email, username_email);
 				
 				statement.execute(sql);
 			}
@@ -308,11 +308,12 @@ public class Database
 	public ReceiveUserPacket getUser(String username_email)
 	{
 		ReceiveUserPacket user = new ReceiveUserPacket();
+		user.toSelf = false;
 		
 		String sql = 
 		String.format(
 		  "SELECT * FROM user "
-		+ "WHERE (email = '%s' OR username = '%s');",
+		+ "WHERE (username = '%s' OR email = '%s');",
 		username_email, username_email);
 		
 		ResultSet rs;
@@ -467,38 +468,35 @@ public class Database
 		
 		ReceiveFriendsPacket packet = new ReceiveFriendsPacket();
 		
-		String[] usernames = null;
-		
 		sql = 
 		String.format(
 		  "SELECT * FROM friends "
 		+ "WHERE user1 = '%s' OR user2 = '%s';",
 		username, username);
 		
+		List<String> u = new ArrayList<String>();
+		
 		try
 		{
 			ResultSet rs = statement.executeQuery(sql);
-			rs.last();
-			usernames = new String[rs.getRow()];
-			rs.beforeFirst();
 			
-			int i=0;
 			while(rs.next())
 			{
 				if (rs.getString("user1").equals(username))
 				{
-					usernames[i++] = rs.getString("user2");
+					u.add(rs.getString("user2"));
 				}
 				else
 				{
-					usernames[i++] = rs.getString("user1");
+					u.add(rs.getString("user1"));
 				}
-				
 			}
 			
 		} catch (SQLException e) {e.printStackTrace();}
 		
-		packet.usernames = usernames;
+		List<ReceiveUserPacket> users = u.stream().map(user -> getUser(user)).collect(Collectors.toList());
+		
+		packet.users = users;
 		
 		return packet;
 	}

@@ -1,6 +1,8 @@
 package com.mpip.chatstation.Packets;
 
+import java.util.List;
+
 public class ReceiveFriendsPacket
 {
-    public String[] usernames;
+    public List<ReceiveUserPacket> users;
 }

@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.mpip.chatstation.Activities.ChatRoomActivity;
-import com.mpip.chatstation.Activities.HomeActivity;
 import com.mpip.chatstation.Activities.LoginRegisterActivity;
 import com.mpip.chatstation.Activities.MainActivity;
 import com.mpip.chatstation.Activities.NavUiMainActivity;
@@ -28,7 +27,9 @@ import com.mpip.chatstation.Packets.ReceiveUserPacket;
 import com.mpip.chatstation.Packets.SystemMessagePacket;
 import com.mpip.chatstation.R;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class KryoListener
 {
@@ -43,7 +44,6 @@ public class KryoListener
     public static void createListener()
     {
         goToMainIntent = new Intent(currentActivity, MainActivity.class);
-        goToHomeIntent = new Intent(currentActivity, HomeActivity.class);
         goToChatRoomIntent = new Intent(currentActivity, ChatRoomActivity.class);
         goToConfirmAccountIntent = new Intent(currentActivity, LoginRegisterActivity.class);
         goToNAVuiIntent = new Intent(currentActivity, NavUiMainActivity.class);
@@ -78,10 +78,8 @@ public class KryoListener
                         }
                         case LOGIN_SUCCESS:
                         {
-//                            goToHomeIntent.putExtra(Constants.EMAIL, LoginFragment.userEmail);
-//                            currentActivity.startActivity(goToHomeIntent);
-                            goToNAVuiIntent.putExtra(Constants.EMAIL, LoginFragment.userEmail);
-                              currentActivity.startActivity(goToNAVuiIntent);
+                            goToNAVuiIntent.putExtra(Constants.USERNAMEEMAIL, LoginFragment.emailid.getText().toString());
+                            currentActivity.startActivity(goToNAVuiIntent);
                             break;
                         }
                         case LOGIN_FAILED:
@@ -98,7 +96,7 @@ public class KryoListener
                         }
                         case ACCOUNT_NOT_CONFIRMED:
                         {
-                            goToConfirmAccountIntent.putExtra(Constants.EMAIL, LoginFragment.userEmail);
+                            goToConfirmAccountIntent.putExtra(Constants.EMAIL, LoginFragment.emailid.getText().toString());
                             currentActivity.startActivity(goToConfirmAccountIntent);
                             break;
                         }
@@ -130,8 +128,6 @@ public class KryoListener
                                 @Override
                                 public void run()
                                 {
-//                                    HomeActivity.tvMessage.setTextColor(Color.rgb(0,255,0));
-//                                    HomeActivity.tvMessage.setText(systemMessage.message);
                                     HomeFragment.showSuccess(systemMessage.message);
                                 }
                             });
@@ -144,8 +140,6 @@ public class KryoListener
                                 @Override
                                 public void run()
                                 {
-//                                    HomeActivity.tvMessage.setTextColor(Color.rgb(255,0,0));
-//                                    HomeActivity.tvMessage.setText(systemMessage.message);
                                     HomeFragment.showError(systemMessage.message);
                                 }
                             });
@@ -163,15 +157,21 @@ public class KryoListener
                 {
                     ReceiveUserPacket packet = (ReceiveUserPacket)object;
 
-                    User.email = packet.email;
-                    User.username = packet.username;
-                    User.first_name = packet.first_name;
-                    User.last_name = packet.last_name;
-                    User.age = packet.age;
-                    User.registered_on = packet.registered_on;
-                    User.last_login = packet.last_login;
-
-                    //HomeActivity.updateInfo();
+                    if (packet.toSelf)
+                    {
+                        NavUiMainActivity.user = new User();
+                        NavUiMainActivity.user.email = packet.email;
+                        NavUiMainActivity.user.username = packet.username;
+                        NavUiMainActivity.user.first_name = packet.first_name;
+                        NavUiMainActivity.user.last_name = packet.last_name;
+                        NavUiMainActivity.user.age = packet.age;
+                        NavUiMainActivity.user.registered_on = packet.registered_on;
+                        NavUiMainActivity.user.last_login = packet.last_login;
+                    }
+                    else
+                    {
+                        //ako gledas profil na nekoj drug
+                    }
                 }
                 else if (object instanceof ReceiveRandomChatPacket)
                 {
@@ -206,7 +206,7 @@ public class KryoListener
                         @Override
                         public void run()
                         {
-                            boolean belongsToMe = packet.username.equals(User.username);
+                            boolean belongsToMe = packet.username.equals(NavUiMainActivity.user.username);
                             ChatRoomActivity.messageAdapter.add(new ChatMessage(packet.message,packet.username,belongsToMe, packet.date, packet.type));
                             ChatRoomActivity.lvMessageBox.setSelection(ChatRoomActivity.lvMessageBox.getCount() - 1);
                         }
@@ -228,12 +228,18 @@ public class KryoListener
                 else if (object instanceof ReceiveFriendsPacket)
                 {
                     ReceiveFriendsPacket packet = (ReceiveFriendsPacket)object;
-
-                    StringBuilder sb = new StringBuilder();
-
-                    for (String username : packet.usernames)
+                    List<User> users = new ArrayList<User>();
+                    for (ReceiveUserPacket user : packet.users)
                     {
-                        sb.append(String.format("%s\n", username));
+                        User u = new User();
+                        u.email = user.email;
+                        u.username = user.username;
+                        u.first_name = user.first_name;
+                        u.last_name = user.last_name;
+                        u.age = user.age;
+                        u.registered_on = user.registered_on;
+                        u.last_login = user.last_login;
+                        users.add(u);
                     }
 
                     currentActivity.runOnUiThread(new Runnable()
@@ -241,8 +247,7 @@ public class KryoListener
                         @Override
                         public void run()
                         {
-                            //FriendsActivity.tvFriends.setText(sb.toString());
-                            FriendsListFragment.friendListAdapter.updateData(Arrays.asList(packet.usernames));
+                            FriendsListFragment.friendListAdapter.updateData(users);
                         }
                     });
                 }

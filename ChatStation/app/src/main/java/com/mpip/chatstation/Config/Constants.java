@@ -6,6 +6,7 @@ public class Constants
 
     public static final String EMAIL = "email";
     public static final String USERNAME = "username";
+    public static final String USERNAMEEMAIL = "username_email";
     public static final String MESSAGE = "message";
     public static final String ROOM_TAGS = "room_tags";
     public static final String MATCHING_TAGS = "matching_tags";

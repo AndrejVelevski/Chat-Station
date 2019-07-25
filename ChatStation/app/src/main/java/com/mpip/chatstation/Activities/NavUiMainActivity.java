@@ -25,7 +25,9 @@ import com.mpip.chatstation.R;
 public class NavUiMainActivity extends AppCompatActivity {
 
     AHBottomNavigation bottomNavigation;
-    String userEmail;
+    public static String username_email;
+
+    public static User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,13 +35,15 @@ public class NavUiMainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_nav_ui_main);
         KryoListener.currentActivity = this;
 
+        username_email = getIntent().getStringExtra(Constants.USERNAMEEMAIL);
+
         bottomNavigation = (AHBottomNavigation) findViewById(R.id.bottom_nav);
 
         //Create Item
         AHBottomNavigationItem item1 = new AHBottomNavigationItem("Home", R.drawable.ic_home_black_24dp, android.R.color.white);
         AHBottomNavigationItem item2 = new AHBottomNavigationItem("Messages", R.drawable.ic_message_black_24dp, android.R.color.white);
         AHBottomNavigationItem item3 = new AHBottomNavigationItem("Friends", R.drawable.ic_people_black_24dp, android.R.color.white);
-        AHBottomNavigationItem item4 = new AHBottomNavigationItem("Friends Requests", R.drawable.ic_people_black_24dp, android.R.color.white);
+        AHBottomNavigationItem item4 = new AHBottomNavigationItem("Friend Requests", R.drawable.ic_people_black_24dp, android.R.color.white);
 
         bottomNavigation.addItem(item1);
         bottomNavigation.addItem(item2);
@@ -51,13 +55,6 @@ public class NavUiMainActivity extends AppCompatActivity {
 
         // Use colored navigation with circle reveal effect
         //bottomNavigation.setColored(true);
-
-        if (User.email == null)
-        {
-            RequestUserPacket packet = new RequestUserPacket();
-            packet.username_email = getIntent().getStringExtra(Constants.EMAIL);
-            new SendPacketThread(packet).start();
-        }
 
         //poceten fragment
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,

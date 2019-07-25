@@ -37,19 +37,19 @@ public class ChatRoomActivity extends AppCompatActivity
         lvMessageBox.setAdapter(messageAdapter);
 
         message = new MessagePacket();
-        message.username = User.username;
+        message.username = NavUiMainActivity.user.username;
 
         message.type = MessagePacket.Type.TOSELF;
         message.message = getIntent().getStringExtra(Constants.MESSAGE);
         new SendPacketThread(message).start();
 
         MessagePacket tmp = new MessagePacket();
-        tmp.username = User.username;
+        tmp.username = NavUiMainActivity.user.username;
         tmp.type = MessagePacket.Type.JOIN;
-        tmp.message = String.format("User %s has entered the chat.", User.username);
+        tmp.message = String.format("User %s has entered the chat.", NavUiMainActivity.user.username);
         if (getIntent().getStringExtra(Constants.ROOM_TAGS).length() > 0)
         {
-            tmp.message += String.format("\n%s likes: %s", User.username, getIntent().getStringExtra(Constants.MATCHING_TAGS));
+            tmp.message += String.format("\n%s likes: %s", NavUiMainActivity.user.username, getIntent().getStringExtra(Constants.MATCHING_TAGS));
         }
         new SendPacketThread(tmp).start();
     }
@@ -58,7 +58,7 @@ public class ChatRoomActivity extends AppCompatActivity
     public void onBackPressed()
     {
         message.type = MessagePacket.Type.LEAVE;
-        message.message = String.format("User %s has left the chat.", User.username);
+        message.message = String.format("User %s has left the chat.", NavUiMainActivity.user.username);
         new SendPacketThread(message).start();
         finish();
     }

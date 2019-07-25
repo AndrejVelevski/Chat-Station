@@ -12,6 +12,7 @@ import androidx.fragment.app.FragmentActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.mpip.chatstation.Activities.NavUiMainActivity;
 import com.mpip.chatstation.Adapters.FriendRequestsAdapter;
 import com.mpip.chatstation.Models.User;
 import com.mpip.chatstation.Networking.KryoListener;
@@ -53,7 +54,7 @@ public class FriendRequestsFragment extends Fragment implements View.OnClickList
         rvFriendRequests.setAdapter(friendRequestsAdapter);
 
         RequestFriendRequestsPacket packet = new RequestFriendRequestsPacket();
-        packet.username = User.username;
+        packet.username = NavUiMainActivity.user.username;
         new SendPacketThread(packet).start();
     }
 

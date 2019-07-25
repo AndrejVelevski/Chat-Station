@@ -23,21 +23,21 @@
 
         <EditText
             android:id="@+id/login_email"
-            android:singleLine="true"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
+            android:autofilledHighlight="@android:color/transparent"
             android:background="@android:color/transparent"
-            android:drawableLeft="@drawable/email"
+            android:drawableLeft="@drawable/user"
             android:drawablePadding="8dp"
             android:gravity="center_vertical"
-            android:hint="@string/email"
+            android:hint="Username | Email"
             android:inputType="textEmailAddress"
             android:padding="10dp"
+            android:singleLine="true"
             android:textColor="@color/white"
             android:textColorHint="@color/white"
-            android:textSize="16sp"
-            android:autofilledHighlight="@android:color/transparent"/>
+            android:textSize="16sp" />
 
         <View
             android:layout_width="fill_parent"

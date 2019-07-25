@@ -32,6 +32,7 @@ import com.mpip.chatstation.Packets.SystemMessagePacket;
 import com.mpip.chatstation.R;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import static com.mpip.chatstation.Config.Constants.serverIP;
 import static com.mpip.chatstation.Config.Constants.serverPort;
@@ -78,6 +79,8 @@ public class MainActivity extends AppCompatActivity
             kryo.register(FriendResponsePacket.Type.class);
             kryo.register(FriendResponsePacket.class);
             kryo.register(String[].class);
+            kryo.register(List.class);
+            kryo.register(ArrayList.class);
             kryo.register(RequestFriendRequestsPacket.class);
             kryo.register(ReceiveFriendRequestsPacket.class);
             kryo.register(RequestFriendsPacket.class);

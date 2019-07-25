@@ -2,6 +2,6 @@ package Packets;
 
 public class LoginUserPacket
 {
-    public String email;
+	public String username_email;
     public String password;
 }

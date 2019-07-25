@@ -2,5 +2,5 @@ package Packets;
 
 public class ResendCodePacket
 {
-    public String email;
+    public String username_email;
 }

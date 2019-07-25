@@ -13,10 +13,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
-        <activity android:name=".Activities.FriendsActivity"></activity>
-        <activity android:name=".Activities.FriendRequestsActivity" />
         <activity android:name=".Activities.NavUiMainActivity" />
-        <activity android:name=".Activities.HomeActivity" />
         <activity android:name=".Activities.LoginRegisterActivity" />
         <activity android:name=".Activities.ChatRoomActivity" />
         <activity android:name=".Activities.MainActivity">

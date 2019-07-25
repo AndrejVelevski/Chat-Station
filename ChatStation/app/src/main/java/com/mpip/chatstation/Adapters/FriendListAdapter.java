@@ -10,12 +10,11 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.mpip.chatstation.Models.NonStaticUser;
+import com.mpip.chatstation.Models.User;
 import com.mpip.chatstation.R;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.FriendListViewHolder> {
 
@@ -58,7 +57,7 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
         }
     }
 
-    private List<NonStaticUser> friends;
+    private List<User> friends;
 
     public FriendListAdapter() {
         friends = new ArrayList<>();
@@ -75,10 +74,10 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
 
     @Override
     public void onBindViewHolder(@NonNull FriendListAdapter.FriendListViewHolder holder, int position) {
-        NonStaticUser user = friends.get(position);
+        User user = friends.get(position);
 
         holder.btnFriendListPic.setText(user.getCharsForPic());
-        holder.friendListUsername.setText(user.getUsername());
+        holder.friendListUsername.setText(user.username);
         holder.friendListFullName.setText(user.getFullName());
     }
 
@@ -87,12 +86,10 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
         return friends.size();
     }
 
-    public void updateData(List<String> usernames)
+    public void updateData(List<User> users)
     {
         this.friends.clear();
-        for(String u : usernames){
-            friends.add(new NonStaticUser(u,"",""));
-        }
+        friends.addAll(users);
 
         // this.friends.addAll(users);
         notifyDataSetChanged();
