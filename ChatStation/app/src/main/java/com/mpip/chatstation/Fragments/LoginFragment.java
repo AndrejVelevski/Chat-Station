@@ -27,6 +27,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
+import com.mpip.chatstation.Activities.MainActivity;
+import com.mpip.chatstation.Config.UserLoginDetails;
 import com.mpip.chatstation.Networking.SendPacketThread;
 import com.mpip.chatstation.Packets.LoginUserPacket;
 import com.mpip.chatstation.R;
@@ -34,16 +36,19 @@ import com.mpip.chatstation.Config.Constants;
 
 import org.mindrot.jbcrypt.BCrypt;
 
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import java.util.regex.Pattern;
 
 public class LoginFragment extends Fragment implements OnClickListener {
     private static View view;
 
     public static EditText emailid;
-    private static EditText password;
+    public static EditText password;
     private Button loginButton;
     private TextView forgotPassword, signUp;
     private CheckBox show_hide_password;
+    public static CheckBox cbRememberMe;
     private static LinearLayout loginLayout;
     public static TextView loginTV;
     private static Animation shakeAnimation;
@@ -51,7 +56,8 @@ public class LoginFragment extends Fragment implements OnClickListener {
 
     private static FragmentActivity context;
 
-    public LoginFragment() {
+    public LoginFragment()
+    {
 
     }
 
@@ -75,8 +81,18 @@ public class LoginFragment extends Fragment implements OnClickListener {
         forgotPassword = view.findViewById(R.id.forgot_password);
         signUp = view.findViewById(R.id.createAccount);
         show_hide_password = view.findViewById(R.id.show_hide_password);
+        cbRememberMe = view.findViewById(R.id.cbRememberMe);
         loginLayout = view.findViewById(R.id.login_layout);
         loginTV = view.findViewById(R.id.loginTitle);
+
+        if (MainActivity.uld != null)
+        {
+            emailid.setText(MainActivity.uld.username_email);
+            password.setText(MainActivity.uld.password);
+            cbRememberMe.setChecked(true);
+            checkValidation();
+        }
+
 
         // Load ShakeAnimation
         shakeAnimation = AnimationUtils.loadAnimation(getActivity(),
@@ -100,6 +116,23 @@ public class LoginFragment extends Fragment implements OnClickListener {
         loginButton.setOnClickListener(this);
         forgotPassword.setOnClickListener(this);
         signUp.setOnClickListener(this);
+
+        cbRememberMe.setOnCheckedChangeListener(new OnCheckedChangeListener()
+        {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked)
+            {
+                if (!isChecked)
+                {
+                    try
+                    {
+                        context.deleteFile("loginDetails.ld");
+                        MainActivity.uld = null;
+                    }
+                    catch (Exception e){}
+                }
+            }
+        });
 
         // Set check listener over checkbox for showing and hiding password
         show_hide_password
@@ -157,45 +190,26 @@ public class LoginFragment extends Fragment implements OnClickListener {
             case R.id.createAccount:
 
                 // Replace signup frgament with animation
-                fragmentManager
-                        .beginTransaction()
-                        .setCustomAnimations(R.anim.right_enter, R.anim.left_exit)
-                        .replace(R.id.frameContainer, new SignUpFragment(),
-                                Constants.SignUp_Fragment).commit();
+                MainActivity.replaceSignUpFragment();
                 break;
         }
 
     }
 
     // Check Validation before login
-    private void checkValidation() {
+    private void checkValidation()
+    {
         // Get email id and password
         String getEmailId = emailid.getText().toString();
         String getPassword = password.getText().toString();
 
         // Check for both field is empty or not
-        if (getEmailId.equals("") || getEmailId.length() == 0
-                || getPassword.equals("") || getPassword.length() == 0) {
-//            loginLayout.startAnimation(shakeAnimation);
-//            new CustomToast().Show_Toast(getActivity(), view,
-//                    "Enter both credentials.");
+        if (getEmailId.equals("") || getEmailId.length() == 0 || getPassword.equals("") || getPassword.length() == 0)
+        {
             showError("Enter both credentials.");
-
         }
-        // Check if email id is valid or not
-        // else if (!m.find())
-/*        else if (!Pattern.compile(String.valueOf(Patterns.EMAIL_ADDRESS)).matcher(getEmailId).matches()){
-//            loginLayout.startAnimation(shakeAnimation);
-//            new CustomToast().Show_Toast(getActivity(), view,
-//                    "Your Email is Invalid.");
-            showError("Your Email is Invalid.");
-        }*/
-            // Else do login and do your stuff
-        else{
-//            System.out.println("LOGIN: "+getEmailId + " | " + getPassword);
-//            Toast.makeText(getActivity(), "Do Login.", Toast.LENGTH_SHORT)
-//                    .show();
-
+        else
+            {
             LoginUserPacket packet = new LoginUserPacket();
             packet.username_email = getEmailId;
             packet.password = BCrypt.hashpw(getPassword, Constants.SALT);

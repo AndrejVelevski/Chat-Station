@@ -1,5 +1,6 @@
 package com.mpip.chatstation.Networking;
 
+import android.content.Context;
 import android.content.Intent;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -7,10 +8,10 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.mpip.chatstation.Activities.ChatRoomActivity;
-import com.mpip.chatstation.Activities.LoginRegisterActivity;
 import com.mpip.chatstation.Activities.MainActivity;
 import com.mpip.chatstation.Activities.NavUiMainActivity;
 import com.mpip.chatstation.Config.Constants;
+import com.mpip.chatstation.Config.UserLoginDetails;
 import com.mpip.chatstation.Fragments.ConfirmFragment;
 import com.mpip.chatstation.Fragments.FriendRequestsFragment;
 import com.mpip.chatstation.Fragments.FriendsListFragment;
@@ -27,6 +28,10 @@ import com.mpip.chatstation.Packets.ReceiveUserPacket;
 import com.mpip.chatstation.Packets.SystemMessagePacket;
 import com.mpip.chatstation.R;
 
+import org.mindrot.jbcrypt.BCrypt;
+
+import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -36,16 +41,13 @@ public class KryoListener
     public static Listener listener;
     public static AppCompatActivity currentActivity;
     private static Intent goToMainIntent;
-    private static Intent goToHomeIntent;
     private static Intent goToChatRoomIntent;
-    private static Intent goToConfirmAccountIntent;
     private static Intent goToNAVuiIntent;
 
     public static void createListener()
     {
         goToMainIntent = new Intent(currentActivity, MainActivity.class);
         goToChatRoomIntent = new Intent(currentActivity, ChatRoomActivity.class);
-        goToConfirmAccountIntent = new Intent(currentActivity, LoginRegisterActivity.class);
         goToNAVuiIntent = new Intent(currentActivity, NavUiMainActivity.class);
 
         listener = new Listener()
@@ -60,8 +62,7 @@ public class KryoListener
                     {
                         case REGISTER_SUCCESS:
                         {
-                            goToConfirmAccountIntent.putExtra(Constants.EMAIL, SignUpFragment.emailuserEmail);
-                            currentActivity.startActivity(goToConfirmAccountIntent);
+                            MainActivity.replaceConfirmFragment(SignUpFragment.emailuserEmail);
                             break;
                         }
                         case REGISTER_FAILED:
@@ -78,6 +79,25 @@ public class KryoListener
                         }
                         case LOGIN_SUCCESS:
                         {
+                            if (LoginFragment.cbRememberMe.isChecked() && MainActivity.uld == null)
+                            {
+                                UserLoginDetails uld = new UserLoginDetails();
+                                uld.username_email = LoginFragment.emailid.getText().toString();
+                                uld.password = LoginFragment.password.getText().toString();
+                                MainActivity.uld = uld;
+
+                                FileOutputStream outputStream;
+                                ObjectOutputStream objectOutputStream;
+                                try
+                                {
+                                    outputStream = currentActivity.openFileOutput("loginDetails.ld", Context.MODE_PRIVATE);
+                                    objectOutputStream = new ObjectOutputStream(outputStream);
+                                    objectOutputStream.writeObject(uld);
+                                    outputStream.close();
+                                    objectOutputStream.close();
+                                }
+                                catch (Exception e) {}
+                            }
                             goToNAVuiIntent.putExtra(Constants.USERNAMEEMAIL, LoginFragment.emailid.getText().toString());
                             currentActivity.startActivity(goToNAVuiIntent);
                             break;
@@ -96,20 +116,27 @@ public class KryoListener
                         }
                         case ACCOUNT_NOT_CONFIRMED:
                         {
-                            goToConfirmAccountIntent.putExtra(Constants.EMAIL, LoginFragment.emailid.getText().toString());
-                            currentActivity.startActivity(goToConfirmAccountIntent);
+                            MainActivity.replaceConfirmFragment(LoginFragment.emailid.getText().toString());
                             break;
                         }
                         case CONFIRMATION_CODE_SUCCESS:
                         {
-                            //currentActivity.startActivity(goToConfirmAccountIntent);
-                            LoginRegisterActivity.fragmentManager
-                                    .beginTransaction()
-                                    .replace(R.id.frameContainer, new LoginFragment(),
-                                            Constants.Login_Fragment).commit();
+                            MainActivity.replaceLoginFragment();
                             break;
                         }
                         case CONFIRMATION_CODE_FAILED:
+                        {
+                            currentActivity.runOnUiThread(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    ConfirmFragment.showError(systemMessage.message);
+                                }
+                            });
+                            break;
+                        }
+                        case RESEND_CONFIRMATION_CODE:
                         {
                             currentActivity.runOnUiThread(new Runnable()
                             {

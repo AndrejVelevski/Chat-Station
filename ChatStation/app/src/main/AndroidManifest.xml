@@ -14,15 +14,13 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity android:name=".Activities.NavUiMainActivity" />
-        <activity android:name=".Activities.LoginRegisterActivity" />
-        <activity android:name=".Activities.ChatRoomActivity" />
-        <activity android:name=".Activities.MainActivity">
+        <activity android:name=".Activities.MainActivity" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".Activities.ChatRoomActivity" />
 
         <meta-data
             android:name="preloaded_fonts"

@@ -212,11 +212,11 @@ public class Database
 		String.format(
 		  "INSERT INTO user(username, email, password, first_name, last_name, age, confirmed, registered_on) "
 		+ "VALUES('%s', '%s', '%s', '%s', '%s', %d, %b, '%s');",
-		user.username, user.email, user.password, user.first_name, user.last_name, user.age, true, LocalDateTime.now());
+		user.username, user.email, user.password, user.first_name, user.last_name, user.age, false, LocalDateTime.now());
 		try
 		{
 			statement.execute(sql);
-			//sendConfirmationCode(user.email, user.username);
+			sendConfirmationCode(user.email, user.username);
 		} catch (SQLException e){e.printStackTrace();}
 	}
 	

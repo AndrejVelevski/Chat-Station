@@ -1,23 +1,27 @@
 package com.mpip.chatstation.Activities;
 
-import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Intent;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.mpip.chatstation.Config.Constants;
+import com.mpip.chatstation.Config.UserLoginDetails;
+import com.mpip.chatstation.Fragments.ConfirmFragment;
+import com.mpip.chatstation.Fragments.LoginFragment;
+import com.mpip.chatstation.Fragments.SignUpFragment;
+import com.mpip.chatstation.Networking.ConnectToServerThread;
+import com.mpip.chatstation.Networking.KryoListener;
+import com.mpip.chatstation.Networking.SendPacketThread;
 import com.mpip.chatstation.Packets.ConfirmUserPacket;
 import com.mpip.chatstation.Packets.FriendRequestPacket;
 import com.mpip.chatstation.Packets.FriendResponsePacket;
 import com.mpip.chatstation.Packets.LoginUserPacket;
 import com.mpip.chatstation.Packets.MessagePacket;
-import com.mpip.chatstation.Networking.ConnectToServerThread;
-import com.mpip.chatstation.Networking.KryoListener;
 import com.mpip.chatstation.Packets.ReceiveFriendRequestsPacket;
 import com.mpip.chatstation.Packets.ReceiveFriendsPacket;
 import com.mpip.chatstation.Packets.ReceiveRandomChatPacket;
@@ -31,6 +35,8 @@ import com.mpip.chatstation.Packets.ResendCodePacket;
 import com.mpip.chatstation.Packets.SystemMessagePacket;
 import com.mpip.chatstation.R;
 
+import java.io.FileInputStream;
+import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,11 +45,9 @@ import static com.mpip.chatstation.Config.Constants.serverPort;
 
 public class MainActivity extends AppCompatActivity
 {
-    private static Button btnRegister;
-    private static Button btnLogin;
-    private static Button btnReconnect;
-
-    public static Client client;
+    public static FragmentManager fragmentManager;
+    public static Client client = null;
+    public static UserLoginDetails uld;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -52,12 +56,7 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         KryoListener.currentActivity = this;
 
-        btnRegister = findViewById(R.id.btnMainRegister);
-        btnLogin = findViewById(R.id.btnMainLogin);
-        btnRegister.setEnabled(false);
-        btnLogin.setEnabled(false);
-        btnReconnect = findViewById(R.id.btnMainReconnect);
-        btnReconnect.setVisibility(View.GONE);
+        fragmentManager = getSupportFragmentManager();
 
         if (client == null)
         {
@@ -86,44 +85,73 @@ public class MainActivity extends AppCompatActivity
             kryo.register(RequestFriendsPacket.class);
             kryo.register(ReceiveFriendsPacket.class);
             client.start();
-        }
-
-        if (KryoListener.listener == null)
-        {
             KryoListener.createListener();
             client.addListener(KryoListener.listener);
         }
 
-        Bundle extras = getIntent().getExtras();
-        if(extras != null)
-        {
-            Toast.makeText(this,extras.getString(Constants.MESSAGE),Toast.LENGTH_LONG).show();
-            btnRegister.setEnabled(false);
-            btnLogin.setEnabled(false);
-            btnReconnect.setVisibility(View.VISIBLE);
-        }
-        else
-        {
-            connectToServer();
-        }
-    }
-
-    public void register(View view)
-    {
-        Intent intent = new Intent(this, LoginRegisterActivity.class);
-        intent.putExtra("REGISTERorLOGIN","Register");
-        startActivity(intent);
-    }
-
-    public void login(View view)
-    {
-        Intent intent = new Intent(this, LoginRegisterActivity.class);
-        startActivity(intent);
-    }
-
-    public void reconnect(View view)
-    {
         connectToServer();
+
+        FileInputStream inputStream;
+        ObjectInputStream objectInputStream;
+        try
+        {
+            inputStream = openFileInput("loginDetails.ld");
+            objectInputStream = new ObjectInputStream(inputStream);
+            uld = (UserLoginDetails) objectInputStream.readObject();
+            inputStream.close();
+            objectInputStream.close();
+        }
+        catch(Exception e){}
+
+        replaceLoginFragment();
+
+        findViewById(R.id.close_activity).setOnClickListener((v) -> finish());
+    }
+
+    // Replace Login Fragment with animation
+    public static void replaceLoginFragment()
+    {
+        fragmentManager.beginTransaction()
+                       .setCustomAnimations(R.anim.left_enter, R.anim.right_exit)
+                       .replace(R.id.frameContainer, new LoginFragment(), Constants.Login_Fragment)
+                       .commit();
+    }
+
+    public static void replaceSignUpFragment()
+    {
+        fragmentManager.beginTransaction()
+                       .setCustomAnimations(R.anim.left_enter, R.anim.right_exit)
+                       .replace(R.id.frameContainer, new SignUpFragment(), Constants.SignUp_Fragment)
+                       .commit();
+    }
+
+    public static void replaceConfirmFragment(String value)
+    {
+        fragmentManager.beginTransaction()
+                       .setCustomAnimations(R.anim.left_enter, R.anim.right_exit)
+                       .replace(R.id.frameContainer, new ConfirmFragment(value), Constants.Confirm_Fragment)
+                       .commit();
+    }
+
+    @Override
+    public void onBackPressed() {
+
+        // Find the tag of signup and forgot password fragment
+        Fragment SignUp_Fragment = fragmentManager
+                .findFragmentByTag(Constants.SignUp_Fragment);
+        Fragment ForgotPassword_Fragment = fragmentManager
+                .findFragmentByTag(Constants.ForgotPassword_Fragment);
+
+        // Check if both are null or not
+        // If both are not null then replace login fragment else do backpressed
+        // task
+
+        if (SignUp_Fragment != null)
+            replaceLoginFragment();
+        else if (ForgotPassword_Fragment != null)
+            replaceLoginFragment();
+        else
+            super.onBackPressed();
     }
 
     private void connectToServer()
@@ -141,23 +169,12 @@ public class MainActivity extends AppCompatActivity
             if (thread.connectionSuccessful)
             {
                 Toast.makeText(this,"Connected to server",Toast.LENGTH_LONG).show();
-                btnRegister.setEnabled(true);
-                btnLogin.setEnabled(true);
-                btnReconnect.setVisibility(View.GONE);
             }
             else
             {
                 Toast.makeText(this,"Failed to connect to server",Toast.LENGTH_LONG).show();
-                btnRegister.setEnabled(false);
-                btnLogin.setEnabled(false);
-                btnReconnect.setVisibility(View.VISIBLE);
             }
         }
         catch(Exception e) { e.printStackTrace();}
-    }
-
-    public void testButtonClick(View view){
-        Intent intent = new Intent(this, NavUiMainActivity.class);
-        startActivityForResult(intent, 0);
     }
 }

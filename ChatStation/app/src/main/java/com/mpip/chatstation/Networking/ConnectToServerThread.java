@@ -1,10 +1,6 @@
 package com.mpip.chatstation.Networking;
 
-import android.content.Context;
-import android.widget.Toast;
-
 import com.esotericsoftware.kryonet.Client;
-import com.mpip.chatstation.Activities.MainActivity;
 
 import java.io.IOException;
 

@@ -257,6 +257,9 @@ public class Main
 	{
 		ReceiveUserPacket user = db.getUser(packet.username_email);
 		db.sendConfirmationCode(user.email, user.username);
+		systemMessagePacket.type = SystemMessagePacket.Type.RESEND_CONFIRMATION_CODE;
+		systemMessagePacket.message = String.format("Code sent to %s.", user.email);
+		connection.sendTCP(systemMessagePacket);
 	}
 
 	private static void confirmUser(Connection connection, ConfirmUserPacket packet)
