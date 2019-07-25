@@ -28,6 +28,7 @@ public class NavUiMainActivity extends AppCompatActivity {
     public static String username_email;
 
     public static User user;
+    private int lastSelectedFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,21 +60,34 @@ public class NavUiMainActivity extends AppCompatActivity {
         //poceten fragment
         getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,
                 new HomeFragment()).commit();
+        lastSelectedFragment = 0;
 
         bottomNavigation.setOnTabSelectedListener((pos,isSelected)->{
             //Toast.makeText(NavUiMainActivity.this, "Start activity: " + pos, Toast.LENGTH_SHORT).show();
+
 
             Fragment selectedFragment = null;
 
             switch (pos){
                 case 0:
-                    selectedFragment = new HomeFragment();
+                    if(lastSelectedFragment != 0) {
+                        System.out.println("HOMEMEMEME: " + lastSelectedFragment);
+                        selectedFragment = new HomeFragment();
+                        lastSelectedFragment = 0;
+                    }
                     break;
                 case 1:
-                    selectedFragment = new FriendsFragment(bottomNavigation);
+
+                    if(lastSelectedFragment != 1){
+                        System.out.println("FRIENDNS: " + lastSelectedFragment);
+                        selectedFragment = new FriendsFragment(bottomNavigation);
+                        lastSelectedFragment = 1;
+                    }
                     break;
                 case 2:
-                    selectedFragment = new FriendRequestsFragment();
+                    if(lastSelectedFragment != 2)
+                        selectedFragment = new FriendRequestsFragment();
+                    lastSelectedFragment = 2;
                     break;
 
             }

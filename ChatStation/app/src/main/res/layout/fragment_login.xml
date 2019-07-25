@@ -81,24 +81,28 @@
                 android:textColor="@color/white"
                 android:textSize="14sp" />
 
-            <TextView
-                android:id="@+id/forgot_password"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="end"
-                android:padding="5dp"
-                android:text="@string/forgot"
-                android:textColor="@color/white"
-                android:textSize="14sp" />
-
             <CheckBox
                 android:id="@+id/cbRememberMe"
+                android:textColor="@color/white"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:layout_gravity="right"
+                android:textSize="14sp"
                 android:text="Remember Me" />
+
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/forgot_password"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="end"
+            android:padding="5dp"
+            android:text="@string/forgot"
+            android:textColor="@color/white"
+            android:textSize="14sp" />
 
         <Button
             android:id="@+id/loginBtn"
