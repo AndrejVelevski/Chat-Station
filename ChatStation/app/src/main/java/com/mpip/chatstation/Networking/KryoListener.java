@@ -145,6 +145,18 @@ public class KryoListener
                             });
                             break;
                         }
+                        case FRIEND_REQUEST:
+                        {
+                            currentActivity.runOnUiThread(new Runnable()
+                            {
+                                @Override
+                                public void run()
+                                {
+                                    HomeFragment.showSuccess(systemMessage.message);
+                                }
+                            });
+                            break;
+                        }
                         case SERVER_CLOSED:
                         {
                             goToMainIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);

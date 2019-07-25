@@ -373,14 +373,26 @@ public class Main
 			db.sendFriendRequest(packet);
 			systemMessagePacket.type = SystemMessagePacket.Type.FRIEND_REQUEST_SUCCESS;
 			systemMessagePacket.message = "Friend request sent successfully.";
+			connection.sendTCP(systemMessagePacket);
+			
+			User user = connectedUsers.values().stream()
+											   .filter(u -> u.username.equals(packet.user_to))
+											   .findFirst()
+											   .orElse(null);
+			
+			if (user != null)
+			{
+				systemMessagePacket.type = SystemMessagePacket.Type.FRIEND_REQUEST;
+				systemMessagePacket.message = String.format("You have a new friend request from %s.", packet.user_from);
+				user.connection.sendTCP(systemMessagePacket);
+			}
 		}
 		catch (UsernameDoesntExistException | FriendRequestPendingException | AlreadyFriendsException e)
 		{
 			systemMessagePacket.type = SystemMessagePacket.Type.FRIEND_REQUEST_FAILED;
 			systemMessagePacket.message = e.getMessage();
+			connection.sendTCP(systemMessagePacket);
 		}
-		
-		connection.sendTCP(systemMessagePacket);
 	}
 	
 	private static void respondToFriendRequest(FriendResponsePacket packet)

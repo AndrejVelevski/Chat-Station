@@ -14,6 +14,8 @@ public class SystemMessagePacket
         CONFIRMATION_CODE_FAILED,
         FRIEND_REQUEST_SUCCESS,
         FRIEND_REQUEST_FAILED,
+        FRIEND_REQUEST,
+        MESSAGE,
         SERVER_CLOSED,
 
         //Client
