@@ -71,7 +71,6 @@ public class NavUiMainActivity extends AppCompatActivity {
             switch (pos){
                 case 0:
                     if(lastSelectedFragment != 0) {
-                        System.out.println("HOMEMEMEME: " + lastSelectedFragment);
                         selectedFragment = new HomeFragment();
                         lastSelectedFragment = 0;
                     }
@@ -79,8 +78,7 @@ public class NavUiMainActivity extends AppCompatActivity {
                 case 1:
 
                     if(lastSelectedFragment != 1){
-                        System.out.println("FRIENDNS: " + lastSelectedFragment);
-                        selectedFragment = new FriendsFragment(bottomNavigation);
+                        selectedFragment = new MessagesFragment();
                         lastSelectedFragment = 1;
                     }
                     break;

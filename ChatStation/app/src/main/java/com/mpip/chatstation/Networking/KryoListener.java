@@ -17,6 +17,7 @@ import com.mpip.chatstation.Fragments.FriendRequestsFragment;
 import com.mpip.chatstation.Fragments.FriendsListFragment;
 import com.mpip.chatstation.Fragments.HomeFragment;
 import com.mpip.chatstation.Fragments.LoginFragment;
+import com.mpip.chatstation.Fragments.MessagesFragment;
 import com.mpip.chatstation.Fragments.SignUpFragment;
 import com.mpip.chatstation.Models.ChatMessage;
 import com.mpip.chatstation.Models.User;
