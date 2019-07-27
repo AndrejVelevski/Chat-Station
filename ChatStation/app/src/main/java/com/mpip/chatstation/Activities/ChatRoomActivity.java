@@ -1,6 +1,8 @@
 package com.mpip.chatstation.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 
 import android.os.Bundle;
@@ -9,6 +11,7 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 import com.mpip.chatstation.Adapters.ChatMessageAdapter;
+import com.mpip.chatstation.Adapters.FriendRequestsAdapter;
 import com.mpip.chatstation.Config.Constants;
 import com.mpip.chatstation.Models.User;
 import com.mpip.chatstation.Networking.KryoListener;
@@ -22,7 +25,8 @@ public class ChatRoomActivity extends AppCompatActivity
 
     private static EditText etMessage;
     public static ChatMessageAdapter messageAdapter;
-    public static ListView lvMessageBox;
+    public static RecyclerView rcMessageBox;
+    private static RecyclerView.LayoutManager layoutManager;
 
     private MessagePacket message;
 
@@ -33,10 +37,18 @@ public class ChatRoomActivity extends AppCompatActivity
         setContentView(R.layout.activity_chat_room);
         KryoListener.currentActivity = this;
 
-        lvMessageBox = findViewById(R.id.lvChatRoomMessageBox);
-        messageAdapter = new ChatMessageAdapter(ChatRoomActivity.this);
+//        rcMessageBox =
+//        messageAdapter = new ChatMessageAdapter(ChatRoomActivity.this);
+//        etMessage = findViewById(R.id.etChatRoomMessage);
+//        rcMessageBox.setAdapter(messageAdapter);
+
         etMessage = findViewById(R.id.etChatRoomMessage);
-        lvMessageBox.setAdapter(messageAdapter);
+        rcMessageBox = findViewById(R.id.lvChatRoomMessageBox);
+        layoutManager = new LinearLayoutManager(this);
+        rcMessageBox.setLayoutManager(layoutManager);
+        messageAdapter = new ChatMessageAdapter(this);
+        rcMessageBox.setAdapter(messageAdapter);
+
 
         message = new MessagePacket();
         message.username = NavUiMainActivity.user.username;

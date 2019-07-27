@@ -11,6 +11,7 @@ import com.mpip.chatstation.Activities.ChatRoomActivity;
 import com.mpip.chatstation.Activities.MainActivity;
 import com.mpip.chatstation.Activities.NavUiMainActivity;
 import com.mpip.chatstation.Activities.PrivateChatActivity;
+import com.mpip.chatstation.Adapters.ChatMessageAdapter;
 import com.mpip.chatstation.Config.Constants;
 import com.mpip.chatstation.Config.UserLoginDetails;
 import com.mpip.chatstation.Fragments.ConfirmFragment;
@@ -252,8 +253,8 @@ public class KryoListener
                         public void run()
                         {
                             boolean belongsToMe = packet.username.equals(NavUiMainActivity.user.username);
-                            ChatRoomActivity.messageAdapter.add(new ChatMessage(packet.message,packet.username,belongsToMe, packet.date, packet.type));
-                            ChatRoomActivity.lvMessageBox.setSelection(ChatRoomActivity.lvMessageBox.getCount() - 1);
+                            ChatRoomActivity.messageAdapter.addChatMessage(new ChatMessage(packet.message,packet.username,belongsToMe, packet.date, packet.type));
+                            ChatRoomActivity.rcMessageBox.smoothScrollToPosition(ChatRoomActivity.messageAdapter.getItemCount() - 1);
                         }
                     });
                 }
@@ -267,12 +268,16 @@ public class KryoListener
                         public void run()
                         {
                             //ova da se napravi vo chatmessage adapterot so funkcija updateData
+
+                            List<ChatMessage> cmList = new ArrayList<>(packet.messages.size());
                             for (PrivateMessagePacket msg : packet.messages)
                             {
                                 boolean belongsToMe = msg.user_from.equals(NavUiMainActivity.user.username);
-                                PrivateChatActivity.messageAdapter.add(new ChatMessage(msg.message,msg.user_from,belongsToMe, msg.date, MessagePacket.Type.MESSAGE));
-                                PrivateChatActivity.lvMessageBox.setSelection(PrivateChatActivity.lvMessageBox.getCount() - 1);
+                                //PrivateChatActivity.messageAdapter.add(new ChatMessage(msg.message,msg.user_from,belongsToMe, msg.date, MessagePacket.Type.MESSAGE));
+                                cmList.add(new ChatMessage(msg.message,msg.user_from,belongsToMe, msg.date, MessagePacket.Type.MESSAGE));
                             }
+                            PrivateChatActivity.messageAdapter.updateData(cmList);
+                            PrivateChatActivity.rcMessageBox.smoothScrollToPosition((PrivateChatActivity.messageAdapter.getItemCount()) <= 0 ? 0 : PrivateChatActivity.messageAdapter.getItemCount() - 1);
                         }
                     });
                 }
@@ -286,8 +291,8 @@ public class KryoListener
                         public void run()
                         {
                             boolean belongsToMe = packet.user_from.equals(NavUiMainActivity.user.username);
-                            PrivateChatActivity.messageAdapter.add(new ChatMessage(packet.message,packet.user_from,belongsToMe, packet.date, MessagePacket.Type.MESSAGE));
-                            PrivateChatActivity.lvMessageBox.setSelection(PrivateChatActivity.lvMessageBox.getCount() - 1);
+                            PrivateChatActivity.messageAdapter.addChatMessage(new ChatMessage(packet.message,packet.user_from,belongsToMe, packet.date, MessagePacket.Type.MESSAGE));
+                            PrivateChatActivity.rcMessageBox.smoothScrollToPosition(PrivateChatActivity.messageAdapter.getItemCount() - 1);
                         }
                     });
                 }

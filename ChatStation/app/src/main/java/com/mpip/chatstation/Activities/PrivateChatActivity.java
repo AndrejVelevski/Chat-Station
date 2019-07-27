@@ -1,6 +1,8 @@
 package com.mpip.chatstation.Activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.os.Bundle;
 import android.view.View;
@@ -22,7 +24,8 @@ public class PrivateChatActivity extends AppCompatActivity
     private PrivateMessagePacket message;
 
     public static ChatMessageAdapter messageAdapter;
-    public static ListView lvMessageBox;
+    public static RecyclerView rcMessageBox;
+    private static RecyclerView.LayoutManager layoutManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -35,9 +38,11 @@ public class PrivateChatActivity extends AppCompatActivity
         etMessage = findViewById(R.id.etChatRoomMessage);
         message = new PrivateMessagePacket();
 
-        lvMessageBox = findViewById(R.id.lvChatRoomMessageBox);
-        messageAdapter = new ChatMessageAdapter(PrivateChatActivity.this);
-        lvMessageBox.setAdapter(messageAdapter);
+        rcMessageBox = findViewById(R.id.lvChatRoomMessageBox);
+        layoutManager = new LinearLayoutManager(this);
+        rcMessageBox.setLayoutManager(layoutManager);
+        messageAdapter = new ChatMessageAdapter(this);
+        rcMessageBox.setAdapter(messageAdapter);
 
         RequestMessagesHistoryPacket packet = new RequestMessagesHistoryPacket();
         packet.user_from = NavUiMainActivity.user.username;

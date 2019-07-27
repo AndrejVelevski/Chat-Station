@@ -6,106 +6,133 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.mpip.chatstation.Activities.PrivateChatActivity;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.mpip.chatstation.Adapters.ViewHolders.ChatMessageViewHolder;
 import com.mpip.chatstation.Models.ChatMessage;
-import com.mpip.chatstation.Packets.PrivateMessagePacket;
 import com.mpip.chatstation.R;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class ChatMessageAdapter extends BaseAdapter {
+import static com.mpip.chatstation.Adapters.ChatMessageAdapter.Type.MESSAGE;
 
-    List<ChatMessage> chatMessages = new ArrayList<ChatMessage>();
+
+public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageViewHolder> {
+
+    List<ChatMessage> chatMessages;
     Context context;
 
     public ChatMessageAdapter(Context context) {
         super();
         this.context = context;
-    }
-
-    public void add(ChatMessage msg) {
-        this.chatMessages.add(msg);
-        notifyDataSetChanged(); // to render the list we need to notify
+        chatMessages = new ArrayList<>();
     }
 
     @Override
-    public int getCount() {
-        return chatMessages.size();
+    public int getItemViewType(int position) {
+        ChatMessage cm = chatMessages.get(position);
+
+        //ova temporary e
+        if(!cm.isBelongsToCurrentUser()) return Type.MESSAGE_R.ordinal();
+
+        switch (cm.getType()){
+            case MESSAGE:
+                return Type.MESSAGE.ordinal();
+            case JOIN:
+                return Type.JOIN.ordinal();
+            case LEAVE:
+                return Type.LEAVE.ordinal();
+            case TOSELF:
+                return Type.TOSELF.ordinal();
+            default:
+                return Type.MESSAGE.ordinal();
+        }
+    }
+
+    @NonNull
+    @Override
+    public ChatMessageViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = null;
+        ChatMessageViewHolder holder;
+
+        switch (Type.values()[viewType]){
+            case MESSAGE:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.sender_message, parent, false);
+                break;
+            case MESSAGE_R:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.receiver_message, parent, false);
+                break;
+            case JOIN:
+            case LEAVE:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.server_chat_message, parent, false);
+                break;
+            case TOSELF:
+                view = LayoutInflater.from(parent.getContext()).inflate(R.layout.to_self_message, parent, false);
+                break;
+        }
+
+        holder = new ChatMessageViewHolder(view);
+        holder.parent = view;
+        return holder;
     }
 
     @Override
-    public Object getItem(int i) {
-        return chatMessages.get(i);
-    }
-
-    @Override
-    public long getItemId(int i) {
-        return i;
-    }
-
-    // This is the backbone of the class, it handles the creation of single ListView row (chat bubble)
-    @Override
-    public View getView(int i, View convertView, ViewGroup viewGroup) {
-        ChatMessageViewHolder holder = new ChatMessageViewHolder();
-        LayoutInflater testMessageInflater = (LayoutInflater) context.getSystemService(Activity.LAYOUT_INFLATER_SERVICE);
-        ChatMessage chatMsg = chatMessages.get(i);
+    public void onBindViewHolder(@NonNull ChatMessageViewHolder holder, int position) {
+        ChatMessage chatMsg = chatMessages.get(position);
 
         switch (chatMsg.getType()){
             case MESSAGE:
-                if (chatMsg.isBelongsToCurrentUser()) { // this Message was sent by us so let's create a basic chat bubble on the right
-                    convertView = testMessageInflater.inflate(R.layout.sender_message, null);
-                    holder.testMessageBody =  convertView.findViewById(R.id.chatMessage_body);
-                    holder.sentAt = convertView.findViewById(R.id.msgSentAt);
-
-                    convertView.setTag(holder);
-
+                if (chatMsg.isBelongsToCurrentUser()) {
                     holder.sentAt.setText(chatMsg.getSentAt());
-                    holder.testMessageBody.setText(chatMsg.getText());
+                    holder.msgBody.setText(chatMsg.getText());
 
                 } else { // this Message was sent by someone else so let's create an advanced chat bubble on the left
-                    convertView = testMessageInflater.inflate(R.layout.receiver_message, null);
-                    holder.name =  convertView.findViewById(R.id.receiverName);
-                    holder.testMessageBody =  convertView.findViewById(R.id.chatMessage_body);
-                    holder.sentAt = convertView.findViewById(R.id.msgSentAt);
-
-                    convertView.setTag(holder);
-
                     holder.name.setText(chatMsg.getUserData());
-                    holder.testMessageBody.setText(chatMsg.getText());
+                    holder.msgBody.setText(chatMsg.getText());
                     holder.sentAt.setText(chatMsg.getSentAt());
                 }
                 break;
             case JOIN:
             case LEAVE:
-                convertView = testMessageInflater.inflate(R.layout.server_chat_message, null);
-                holder.testMessageBody =  convertView.findViewById(R.id.chatMessage_body);
-                holder.sentAt = convertView.findViewById(R.id.msgSentAt);
-
-                convertView.setTag(holder);
-
                 holder.sentAt.setText(chatMsg.getSentAt());
-                holder.testMessageBody.setText(chatMsg.getText());
+                holder.msgBody.setText(chatMsg.getText());
                 break;
             case TOSELF:
-                convertView = testMessageInflater.inflate(R.layout.to_self_message, null);
-                holder.testMessageBody =  convertView.findViewById(R.id.chatMessage_body);
-
-                convertView.setTag(holder);
-
-                holder.testMessageBody.setText(chatMsg.getText());
+                holder.msgBody.setText(chatMsg.getText());
                 break;
         }
-
-
-        return convertView;
     }
-}
 
-class ChatMessageViewHolder {
-    public TextView name;
-    public TextView testMessageBody;
-    public TextView sentAt;
+    @Override
+    public int getItemCount() {
+        return chatMessages.size();
+    }
+
+    public void addChatMessage(ChatMessage msg) {
+        this.chatMessages.add(msg);
+        notifyDataSetChanged(); // to render the list we need to notify
+    }
+
+    public void updateData(List<ChatMessage> msgs){
+        this.chatMessages.clear();
+        chatMessages.addAll(msgs);
+
+        notifyDataSetChanged();
+    }
+
+    public enum Type
+    {
+        JOIN,
+        LEAVE,
+        TOSELF,
+        MESSAGE,
+        MESSAGE_R
+    }
+
+
 }

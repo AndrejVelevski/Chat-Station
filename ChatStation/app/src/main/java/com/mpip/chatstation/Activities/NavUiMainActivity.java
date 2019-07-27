@@ -79,7 +79,6 @@ public class NavUiMainActivity extends AppCompatActivity
                     }
                     break;
                 case 1:
-
                     if(lastSelectedFragment != 1){
                         selectedFragment = new MessagesFragment();
                         lastSelectedFragment = 1;
@@ -88,13 +87,14 @@ public class NavUiMainActivity extends AppCompatActivity
                 case 2:
                     if(lastSelectedFragment != 2)
                         selectedFragment = new FriendRequestsFragment();
-                    lastSelectedFragment = 2;
-                    break;
+                        lastSelectedFragment = 2;
+                        break;
 
             }
 
             if(selectedFragment!=null){
-                getSupportFragmentManager().beginTransaction().add(R.id.fragment_container,selectedFragment)
+                //this.getSupportFragmentManager().popBackStack();
+                getSupportFragmentManager().beginTransaction().replace(R.id.fragment_container,selectedFragment)
                         .commit();
             }
 
