@@ -7,7 +7,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.TextView;
+
+import com.mpip.chatstation.Activities.PrivateChatActivity;
 import com.mpip.chatstation.Models.ChatMessage;
+import com.mpip.chatstation.Packets.PrivateMessagePacket;
 import com.mpip.chatstation.R;
 
 import java.util.ArrayList;
@@ -99,7 +102,6 @@ public class ChatMessageAdapter extends BaseAdapter {
 
         return convertView;
     }
-
 }
 
 class ChatMessageViewHolder {

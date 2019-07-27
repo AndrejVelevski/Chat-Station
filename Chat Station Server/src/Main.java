@@ -25,6 +25,7 @@ import Exceptions.IncorrectUsernameOrPasswordException;
 import Exceptions.UsernameAlreadyExistsException;
 import Exceptions.UsernameDoesntExistException;
 import Models.ChatRoom;
+import Models.LastMessagePacket;
 import Models.User;
 import Packets.*;
 
@@ -63,6 +64,12 @@ public class Main
         kryo.register(ReceiveFriendRequestsPacket.class);
         kryo.register(RequestFriendsPacket.class);
         kryo.register(ReceiveFriendsPacket.class);
+        kryo.register(RequestMessagesHistoryPacket.class);
+        kryo.register(ReceiveMessagesHistoryPacket.class);
+        kryo.register(PrivateMessagePacket.class);
+        kryo.register(RequestLastMessagesPacket.class);
+        kryo.register(LastMessagePacket.class);
+        kryo.register(ReceiveLastMessagesPacket.class);
 	    
 	    db = new Database("chatstation");
 	    connectedUsers = new HashMap<Integer, User>();
@@ -144,6 +151,21 @@ public class Main
 	        		RequestFriendsPacket packet = (RequestFriendsPacket)object;
 	        		getFriends(connection, packet);
 	        	}
+	        	else if (object instanceof RequestMessagesHistoryPacket)
+	        	{
+	        		RequestMessagesHistoryPacket packet = (RequestMessagesHistoryPacket)object;
+	        		requestMessagesHistory(connection, packet);
+	        	}
+	        	else if (object instanceof PrivateMessagePacket)
+	        	{
+	        		PrivateMessagePacket packet = (PrivateMessagePacket)object;
+	        		sendPrivateMessage(connection, packet);
+	        	}
+	        	else if (object instanceof RequestLastMessagesPacket)
+	        	{
+	        		RequestLastMessagesPacket packet = (RequestLastMessagesPacket)object;
+	        		requestLastMessages(connection, packet);
+	        	}
 	        }
 	     });
 	    
@@ -223,7 +245,7 @@ public class Main
 			connectedUsers.put(connection.getID(), new User(connection, user.username));
 			user.toSelf = true;
 			connection.sendTCP(user);
-			System.out.println(String.format("Logged in user '%s'...", packet.username_email));
+			System.out.println(String.format("User %s logged in.", user.username));
 		}
 		catch (IncorrectUsernameOrPasswordException e)
 		{
@@ -345,7 +367,7 @@ public class Main
 
 	private static void sendMessage(Connection connection, MessagePacket packet)
 	{
-		packet.date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss"));
+		packet.date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
 		
 		if (packet.type == MessagePacket.Type.TOSELF)
 		{
@@ -411,5 +433,34 @@ public class Main
 	private static void getFriends(Connection connection, RequestFriendsPacket packet)
 	{
 		connection.sendTCP(db.getFriends(packet.username));
+	}
+	private static void requestMessagesHistory(Connection connection, RequestMessagesHistoryPacket packet)
+	{
+		connection.sendTCP(db.requestMessagesHistory(packet));
+	}
+	private static void sendPrivateMessage(Connection connection, PrivateMessagePacket packet)
+	{
+		packet.date = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+		
+		db.sendPrivateMessage(packet);
+		
+		User user = connectedUsers.values().stream()
+				   .filter(u -> u.username.equals(packet.user_to))
+				   .findFirst()
+				   .orElse(null);
+	
+		connection.sendTCP(packet);
+		if (user != null)
+		{
+			systemMessagePacket.type = SystemMessagePacket.Type.MESSAGE;
+			systemMessagePacket.message = String.format("You have a new message from %s.", packet.user_from);
+			user.connection.sendTCP(systemMessagePacket);
+			user.connection.sendTCP(packet);
+		}
+	}
+	
+	private static void requestLastMessages(Connection connection, RequestLastMessagesPacket packet)
+	{
+		connection.sendTCP(db.requestLastMessages(packet));
 	}
 }

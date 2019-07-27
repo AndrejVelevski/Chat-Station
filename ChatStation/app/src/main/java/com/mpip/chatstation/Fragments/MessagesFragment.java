@@ -4,9 +4,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.LinearLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -16,16 +13,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.mpip.chatstation.Activities.NavUiMainActivity;
-import com.mpip.chatstation.Adapters.FriendListAdapter;
-import com.mpip.chatstation.Adapters.FriendRequestsAdapter;
 import com.mpip.chatstation.Adapters.MessagesHistoryAdapter;
-import com.mpip.chatstation.Models.LastMessageHistory;
-import com.mpip.chatstation.Models.User;
-import com.mpip.chatstation.Networking.KryoListener;
+import com.mpip.chatstation.Packets.LastMessagePacket;
 import com.mpip.chatstation.Networking.SendPacketThread;
-import com.mpip.chatstation.Packets.FriendRequestPacket;
-import com.mpip.chatstation.Packets.RequestFriendRequestsPacket;
-import com.mpip.chatstation.Packets.RequestFriendsPacket;
+import com.mpip.chatstation.Packets.RequestLastMessagesPacket;
 import com.mpip.chatstation.R;
 
 import java.util.ArrayList;
@@ -49,6 +40,10 @@ public class MessagesFragment extends Fragment implements View.OnClickListener {
         initViews();
         context = getActivity();
 
+        RequestLastMessagesPacket packet = new RequestLastMessagesPacket();
+        packet.username = NavUiMainActivity.user.username;
+        new SendPacketThread(packet).start();
+
         return view;
     }
 
@@ -62,13 +57,6 @@ public class MessagesFragment extends Fragment implements View.OnClickListener {
         rvLastMesseges.setLayoutManager(layoutManager);
         lastMessagesAdapter = new MessagesHistoryAdapter();
         rvLastMesseges.setAdapter(lastMessagesAdapter);
-
-        // TUKA TREBA GET PACKETS
-
-        //TEST
-        List<LastMessageHistory> testList = new ArrayList<LastMessageHistory>();
-        testList.add(new LastMessageHistory("Miki","Miroslav", "Vucevski", "Jas sum tuka za da testiram dupki!",new Date().toString()));
-        lastMessagesAdapter.updateData(testList);
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.mpip.chatstation.Adapters;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,8 +10,9 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.mpip.chatstation.Models.LastMessageHistory;
-import com.mpip.chatstation.Models.User;
+import com.mpip.chatstation.Activities.PrivateChatActivity;
+import com.mpip.chatstation.Config.Constants;
+import com.mpip.chatstation.Packets.LastMessagePacket;
 import com.mpip.chatstation.R;
 
 import java.util.ArrayList;
@@ -30,14 +32,16 @@ public class MessagesHistoryAdapter extends RecyclerView.Adapter<MessagesHistory
             llMessageItem = view.findViewById(R.id.llMessageItem);
 
             llMessageItem.setOnClickListener(l->{
-                //otvori go pendzereto!!
+                Intent intent = new Intent(parent.getContext(), PrivateChatActivity.class);
+                intent.putExtra(Constants.USERNAME, userName.getText().toString());
+                parent.getContext().startActivity(intent);
             });
 
         }
 
     }
 
-    private List<LastMessageHistory> messagesHistory;
+    private List<LastMessagePacket> messagesHistory;
 
     public MessagesHistoryAdapter(){messagesHistory = new ArrayList<>(); }
 
@@ -52,11 +56,11 @@ public class MessagesHistoryAdapter extends RecyclerView.Adapter<MessagesHistory
 
     @Override
     public void onBindViewHolder(@NonNull MessageHistoryViewHolder holder, int position) {
-        LastMessageHistory lastMsg = messagesHistory.get(position);
+        LastMessagePacket lastMsg = messagesHistory.get(position);
 
-        holder.userName.setText(lastMsg.getFullName());
-        holder.lastMsg.setText(lastMsg.getMessage());
-        holder.dateAt.setText(lastMsg.getDateAt());
+        holder.userName.setText(lastMsg.username);
+        holder.lastMsg.setText(lastMsg.message);
+        holder.dateAt.setText(lastMsg.date);
     }
 
     @Override
@@ -64,7 +68,7 @@ public class MessagesHistoryAdapter extends RecyclerView.Adapter<MessagesHistory
         return messagesHistory.size();
     }
 
-    public void updateData(List<LastMessageHistory> lastMsgs)
+    public void updateData(List<LastMessagePacket> lastMsgs)
     {
         this.messagesHistory.clear();
         messagesHistory.addAll(lastMsgs);

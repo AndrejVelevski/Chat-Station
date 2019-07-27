@@ -1,8 +1,8 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,14 +18,19 @@ import Exceptions.IncorrectConfirmationCodeException;
 import Exceptions.IncorrectUsernameOrPasswordException;
 import Exceptions.UsernameAlreadyExistsException;
 import Exceptions.UsernameDoesntExistException;
+import Models.LastMessagePacket;
 import Packets.FriendRequestPacket;
 import Packets.FriendResponsePacket;
 import Packets.LoginUserPacket;
+import Packets.PrivateMessagePacket;
 import Packets.ReceiveFriendRequestsPacket;
 import Packets.ReceiveFriendsPacket;
+import Packets.ReceiveLastMessagesPacket;
+import Packets.ReceiveMessagesHistoryPacket;
 import Packets.ReceiveUserPacket;
 import Packets.RegisterUserPacket;
-import Packets.RequestFriendsPacket;
+import Packets.RequestLastMessagesPacket;
+import Packets.RequestMessagesHistoryPacket;
 
 public class Database
 {
@@ -35,18 +40,16 @@ public class Database
 	private static final String parametars = "?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
 	
 	private Connection connection;
-	private Statement statement;
+	private PreparedStatement st;
 	
 	public Database(String name)
 	{
 		connection = null;
-		statement = null;
 		createDatabase(name);
 		
 		try
 		{
 			connection = DriverManager.getConnection(String.format("%s%s%s", url, name, parametars), user, password);
-			statement = connection.createStatement();
 		}
 		catch (SQLException e)
 		{
@@ -65,10 +68,10 @@ public class Database
 			System.out.println("Connected");
 
 		    System.out.println(String.format("Creating database '%s'...", name));
-		    statement = connection.createStatement();
 		      
 		    String sql = String.format("CREATE DATABASE %s", name);
-		    statement.executeUpdate(sql);
+		    st = connection.prepareStatement(sql);
+		    st.executeUpdate();
 		    System.out.println(String.format("Database '%s' created successfully...", name));
 		}
 		catch (Exception e)
@@ -77,8 +80,6 @@ public class Database
 		}
 		finally
 		{
-			if (statement != null)
-				try {statement.close();} catch (SQLException e) {System.out.println(e.getMessage());}
 			if (connection != null)
 				try {connection.close();} catch (SQLException e) {System.out.println(e.getMessage());}
 		}
@@ -118,37 +119,16 @@ public class Database
 		createTable("friends", sql);
 		
 		sql =
-		  "CREATE TABLE room"
-		+ "("
-		+ "id INT AUTO_INCREMENT,"
-		+ "name VARCHAR(50),"
-		+ "PRIMARY KEY (id)"
-		+ ")";
-		createTable("room", sql);
-		
-		sql =
-		  "CREATE TABLE room_members"
-		+ "("
-		+ "id INT AUTO_INCREMENT,"
-		+ "room INT NOT NULL,"
-		+ "user VARCHAR(50) NOT NULL,"
-		+ "PRIMARY KEY (id),"
-		+ "FOREIGN KEY (room) REFERENCES room(id),"
-		+ "FOREIGN KEY (user) REFERENCES user(username)"
-		+ ")";
-		createTable("room_members", sql);
-		
-		sql =
 		  "CREATE TABLE messages"
 		+ "("
 		+ "id INT AUTO_INCREMENT,"
-		+ "user VARCHAR(50) NOT NULL,"
-		+ "room INT NOT NULL,"
+		+ "user_from VARCHAR(50) NOT NULL,"
+		+ "user_to VARCHAR(50) NOT NULL,"
 		+ "message VARCHAR(1000) NOT NULL,"
 		+ "date DATETIME NOT NULL,"
 		+ "PRIMARY KEY (id),"
-		+ "FOREIGN KEY (user) REFERENCES user(username),"
-		+ "FOREIGN KEY (room) REFERENCES room(id)"
+		+ "FOREIGN KEY (user_from) REFERENCES user(username),"
+		+ "FOREIGN KEY (user_to) REFERENCES user(username)"
 		+ ")";
 		createTable("messages", sql);
 		
@@ -169,7 +149,8 @@ public class Database
 		try
 		{
 			System.out.println(String.format("Creating table '%s'...", name));
-			statement.execute(sql);
+			st = connection.prepareStatement(sql);
+			st.execute();
 			System.out.println(String.format("Table '%s' create successfully...", name));
 		}
 		catch (Exception e)
@@ -182,27 +163,25 @@ public class Database
 	{
 		String sql;
 		
-		sql = 
-		String.format(
-		  "SELECT * FROM user "
-		+ "WHERE email = '%s';",
-		user.email);
 		try 
 		{
-			ResultSet rs = statement.executeQuery(sql);
+			sql = "SELECT * FROM user " +
+	              "WHERE email = ?";
+			st = connection.prepareStatement(sql);
+			st.setString(1, user.email);
+			ResultSet rs = st.executeQuery();
 			rs.last();
 			if (rs.getRow() > 0)
 				throw new EmailAlreadyExistsException(String.format("Email %s already exists.", user.email));
 		} catch (SQLException e) {e.printStackTrace();}
 		
-		sql = 
-		String.format(
-		  "SELECT * FROM user "
-		+ "WHERE username = '%s';",
-		user.username);
 		try 
 		{
-			ResultSet rs = statement.executeQuery(sql);
+			sql = "SELECT * FROM user " +
+		          "WHERE username = ?";
+			st = connection.prepareStatement(sql);
+			st.setString(1, user.username);
+			ResultSet rs = st.executeQuery();
 			rs.last();
 			if (rs.getRow() > 0)
 				throw new UsernameAlreadyExistsException(String.format("Username %s already exists.", user.username));
@@ -212,11 +191,22 @@ public class Database
 		String.format(
 		  "INSERT INTO user(username, email, password, first_name, last_name, age, confirmed, registered_on) "
 		+ "VALUES('%s', '%s', '%s', '%s', '%s', %d, %b, '%s');",
-		user.username, user.email, user.password, user.first_name, user.last_name, user.age, false, LocalDateTime.now());
+		user.username, user.email, user.password, user.first_name, user.last_name, user.age, true, LocalDateTime.now());
 		try
 		{
-			statement.execute(sql);
-			sendConfirmationCode(user.email, user.username);
+			sql = "INSERT INTO user(username, email, password, first_name, last_name, age, confirmed, registered_on) "
+				+ "VALUES(?, ?, ?, ?, ?, ?, ?, ?);";
+			st = connection.prepareStatement(sql);
+			st.setString(1, user.username);
+			st.setString(2, user.email);
+			st.setString(3, user.password);
+			st.setString(4, user.first_name);
+			st.setString(5, user.last_name);
+			st.setInt(6, user.age);
+			st.setBoolean(7, true);
+			st.setString(8, LocalDateTime.now().toString());
+			st.execute();
+			//sendConfirmationCode(user.email, user.username);
 		} catch (SQLException e){e.printStackTrace();}
 	}
 	
@@ -224,14 +214,15 @@ public class Database
 	{
 		String sql;
 		
-		sql = 
-		String.format(
-		  "SELECT * FROM user "
-		+ "WHERE (username = '%s' OR email = '%s') AND password = '%s';",
-		user.username_email, user.username_email, user.password);
 		try 
 		{
-			ResultSet rs = statement.executeQuery(sql);
+			sql = "SELECT * FROM user "
+				+ "WHERE (username = ? OR email = ?) AND password = ?;";
+			st = connection.prepareStatement(sql);
+			st.setString(1, user.username_email);
+			st.setString(2, user.username_email);
+			st.setString(3, user.password);
+			ResultSet rs = st.executeQuery();
 			rs.last();
 			if (rs.getRow() > 0)
 			{
@@ -240,13 +231,14 @@ public class Database
 					throw new AccountNotConfirmedException(String.format("Account %s is not confirmed.", user.username_email));
 				}
 				
-				sql = String.format(
-						  "UPDATE user "
-						+ "SET last_login = '%s' "
-						+ "WHERE username = '%s' OR email = '%s';",
-						LocalDateTime.now(), user.username_email, user.username_email);
-				
-				statement.execute(sql);
+				sql = "UPDATE user "
+					+ "SET last_login = ? "
+					+ "WHERE username = ? OR email = ?;";
+				st = connection.prepareStatement(sql);
+				st.setString(1, LocalDateTime.now().toString());
+				st.setString(2, user.username_email);
+				st.setString(3, user.username_email);
+				st.execute();
 						
 				return;
 			}
@@ -259,15 +251,17 @@ public class Database
 	public void sendConfirmationCode(String email, String username)
 	{
 		String code = generateConfirmationCode(8);
-		String sql = String.format(
-			  "UPDATE user "
-			+ "SET confirm_code = '%s' "
-			+ "WHERE username = '%s';",
-			code, username);
-		
+		String sql;
 		try
 		{
-			statement.execute(sql);
+			sql = "UPDATE user "
+				+ "SET confirm_code = ? "
+				+ "WHERE username = ?;";
+			st = connection.prepareStatement(sql);
+			st.setString(1, code);
+			st.setString(2, username);
+			st.execute();
+			
 			Email.send(email, username, code);
 		} catch (SQLException e) {e.printStackTrace();}
 	}
@@ -276,26 +270,27 @@ public class Database
 	{
 		String sql;
 		
-		sql = 
-		String.format(
-		  "SELECT * FROM user "
-		+ "WHERE username = '%s' OR email = '%s';",
-		username_email, username_email);
-		
 		try 
 		{
-			ResultSet rs = statement.executeQuery(sql);
+			sql = "SELECT * FROM user "
+				+ "WHERE username = ? OR email = ?;";
+			st = connection.prepareStatement(sql);
+			st.setString(1, username_email);
+			st.setString(2, username_email);
+			ResultSet rs = st.executeQuery();
 			rs.first();
 			
 			if (rs.getString("confirm_code").equals(code))
 			{
-				sql = String.format(
-						  "UPDATE user "
-						+ "SET confirmed = %b "
-						+ "WHERE username = '%s' OR email = '%s';",
-						true, username_email, username_email);
+				sql = "UPDATE user "
+					+ "SET confirmed = ? "
+					+ "WHERE username = ? OR email = ?;";
+				st = connection.prepareStatement(sql);
+				st.setBoolean(1, true);
+				st.setString(2, username_email);
+				st.setString(3, username_email);
 				
-				statement.execute(sql);
+				st.execute();
 			}
 			else
 			{
@@ -309,17 +304,17 @@ public class Database
 	{
 		ReceiveUserPacket user = new ReceiveUserPacket();
 		user.toSelf = false;
-		
-		String sql = 
-		String.format(
-		  "SELECT * FROM user "
-		+ "WHERE (username = '%s' OR email = '%s');",
-		username_email, username_email);
+		String sql;
 		
 		ResultSet rs;
 		try 
 		{
-			rs = statement.executeQuery(sql);
+			sql = "SELECT * FROM user "
+				+ "WHERE (username = ? OR email = ?);";
+			st = connection.prepareStatement(sql);
+			st.setString(1, username_email);
+			st.setString(2, username_email);
+			rs = st.executeQuery();
 			rs.first();
 			
 			user.email = rs.getString("email");
@@ -341,52 +336,51 @@ public class Database
 		
 		try 
 		{
-			sql = 
-				String.format(
-				  "SELECT * FROM user "
-				+ "WHERE username = '%s';",
-				packet.user_to);
-			rs = statement.executeQuery(sql);
+			sql = "SELECT * FROM user "
+				+ "WHERE username = ?;";
+			st = connection.prepareStatement(sql);
+			st.setString(1, packet.user_to);
+			rs = st.executeQuery();
 			rs.last();
 			if (rs.getRow() == 0)
 				throw new UsernameDoesntExistException(String.format("Username %s doesn't exist.", packet.user_to));
 			
-			sql = 
-			String.format(
-			  "SELECT * FROM friends "
-			+ "WHERE user1 = '%s' AND user2 = '%s';",
-			packet.user_from, packet.user_to);
-			rs = statement.executeQuery(sql);
+			sql = "SELECT * FROM friends "
+				+ "WHERE user1 = ? AND user2 = ?;";
+			st = connection.prepareStatement(sql);
+			st.setString(1, packet.user_from);
+			st.setString(2, packet.user_to);
+			rs = st.executeQuery();
 			rs.last();
 			if (rs.getRow() > 0)
 				throw new AlreadyFriendsException(String.format("You are already friends with %s.", packet.user_to));
 			
-			sql = 
-				String.format(
-				  "SELECT * FROM friend_requests "
-				+ "WHERE user_from = '%s' AND user_to = '%s';",
-				packet.user_from, packet.user_to);
-			rs = statement.executeQuery(sql);
+			sql = "SELECT * FROM friend_requests "
+				+ "WHERE user_from = ? AND user_to = ?;";
+			st = connection.prepareStatement(sql);
+			st.setString(1, packet.user_from);
+			st.setString(2, packet.user_to);
+			rs = st.executeQuery();
 			rs.last();
 			if (rs.getRow() > 0)
 				throw new FriendRequestPendingException(String.format("Username %s already has a pending friend request.", packet.user_to));
 			
-			sql = 
-				String.format(
-				  "SELECT * FROM friend_requests "
-				+ "WHERE user_from = '%s' AND user_to = '%s';",
-				packet.user_to, packet.user_from);
-			rs = statement.executeQuery(sql);
+			sql = "SELECT * FROM friend_requests "
+				+ "WHERE user_from = ? AND user_to = ?;";
+			st = connection.prepareStatement(sql);
+			st.setString(1, packet.user_to);
+			st.setString(2, packet.user_from);
+			rs = st.executeQuery();
 			rs.last();
 			if (rs.getRow() > 0)
 				throw new FriendRequestPendingException(String.format("You already have a pending friend request from %s.", packet.user_to));
 			
-			sql = 
-				String.format(
-				  "INSERT INTO friend_requests "
-				+ "VALUES('%s', '%s');",
-				packet.user_from, packet.user_to);
-			statement.execute(sql);
+			sql = "INSERT INTO friend_requests "
+				+ "VALUES(?, ?);";
+			st = connection.prepareStatement(sql);
+			st.setString(1, packet.user_from);
+			st.setString(2, packet.user_to);
+			st.execute();
 			
 		} catch (SQLException e) {e.printStackTrace();}
 	}
@@ -399,19 +393,19 @@ public class Database
 		{
 			try
 			{
-				sql = 
-				String.format(
-				  "INSERT INTO friends "
-				+ "VALUES('%s', '%s');",
-				packet.user_from, packet.user_to);
-				statement.execute(sql);
+				sql = "INSERT INTO friends "
+					+ "VALUES(?, ?);";
+				st = connection.prepareStatement(sql);
+				st.setString(1, packet.user_from);
+				st.setString(2, packet.user_to);
+				st.execute();
 				
-				sql = 
-				String.format(
-				  "DELETE FROM friend_requests "
-				+ "WHERE user_from = '%s' AND user_to = '%s';",
-				packet.user_from, packet.user_to);
-				statement.execute(sql);
+				sql = "DELETE FROM friend_requests "
+					+ "WHERE user_from = ? AND user_to = ?;";
+				st = connection.prepareStatement(sql);
+				st.setString(1, packet.user_from);
+				st.setString(2, packet.user_to);
+				st.execute();
 			}
 			catch (SQLException e) {e.printStackTrace();}
 		}
@@ -419,12 +413,12 @@ public class Database
 		{
 			try
 			{
-				sql = 
-				String.format(
-				  "DELETE FROM friend_requests "
-				+ "WHERE user_from = '%s' AND user_to = '%s';",
-				packet.user_from, packet.user_to);
-				statement.execute(sql);
+				sql = "DELETE FROM friend_requests "
+					+ "WHERE user_from = ? AND user_to = ?;";
+				st = connection.prepareStatement(sql);
+				st.setString(1, packet.user_from);
+				st.setString(2, packet.user_to);
+				st.execute();
 			} catch (SQLException e) {e.printStackTrace();}
 		}
 	}
@@ -433,18 +427,18 @@ public class Database
 	{
 		ReceiveFriendRequestsPacket packet = new ReceiveFriendRequestsPacket();
 		
-		String sql = 
-		String.format(
-		  "SELECT * FROM friend_requests "
-		+ "WHERE user_to = '%s';",
-		username);
+		String sql;
 		
 		String[] usernames = null;
 		
 		ResultSet rs;
 		try 
 		{
-			rs = statement.executeQuery(sql);
+			sql = "SELECT * FROM friend_requests "
+				+ "WHERE user_to = ?;";
+			st = connection.prepareStatement(sql);
+			st.setString(1, username);
+			rs = st.executeQuery();
 			
 			rs.last();
 			usernames = new String[rs.getRow()];
@@ -468,17 +462,16 @@ public class Database
 		
 		ReceiveFriendsPacket packet = new ReceiveFriendsPacket();
 		
-		sql = 
-		String.format(
-		  "SELECT * FROM friends "
-		+ "WHERE user1 = '%s' OR user2 = '%s';",
-		username, username);
-		
 		List<String> u = new ArrayList<String>();
 		
 		try
 		{
-			ResultSet rs = statement.executeQuery(sql);
+			sql = "SELECT * FROM friends "
+				+ "WHERE user1 = ? OR user2 = ?;";
+			st = connection.prepareStatement(sql);
+			st.setString(1, username);
+			st.setString(2, username);
+			ResultSet rs = st.executeQuery();
 			
 			while(rs.next())
 			{
@@ -501,11 +494,110 @@ public class Database
 		return packet;
 	}
 	
+	public ReceiveMessagesHistoryPacket requestMessagesHistory(RequestMessagesHistoryPacket packet)
+	{
+		ReceiveMessagesHistoryPacket p = new ReceiveMessagesHistoryPacket();
+	
+		String sql;
+		
+		List<PrivateMessagePacket> messages = new ArrayList<PrivateMessagePacket>();
+		
+		try
+		{
+			sql = "SELECT * FROM messages "
+				+ "WHERE (user_from = ? AND user_to = ?) OR (user_from = ? AND user_to = ?);";
+			st = connection.prepareStatement(sql);
+			st.setString(1, packet.user_from);
+			st.setString(2, packet.user_to);
+			st.setString(3, packet.user_to);
+			st.setString(4, packet.user_from);
+
+			ResultSet rs = st.executeQuery();
+			
+			while(rs.next())
+			{
+				PrivateMessagePacket msg = new PrivateMessagePacket();
+				msg.user_from = rs.getString("user_from");
+				msg.user_to = rs.getString("user_to");
+				msg.messaage = rs.getString("message");
+				msg.date = rs.getString("date");
+				
+				messages.add(msg);
+			}
+		}
+		catch (SQLException e) {e.printStackTrace();}
+		
+		p.messages = messages;
+		
+		return p;
+	}
+	
+	public void sendPrivateMessage(PrivateMessagePacket packet)
+	{
+		String sql;
+		
+		try
+		{
+			sql = "INSERT INTO messages(user_from, user_to, message, date) " +
+				  "VALUES(?, ?, ?, ?);";
+			st = connection.prepareStatement(sql);
+			st.setString(1, packet.user_from);
+			st.setString(2, packet.user_to);
+			st.setString(3, packet.messaage);
+			st.setString(4, packet.date);
+			st.execute();
+		}
+		catch(SQLException e) {e.printStackTrace();}
+	}
+	
+	public ReceiveLastMessagesPacket requestLastMessages(RequestLastMessagesPacket packet)
+	{
+		String sql;
+		
+		ReceiveLastMessagesPacket p = new ReceiveLastMessagesPacket();
+		
+		List<LastMessagePacket> messages = new ArrayList();
+		
+		try
+		{
+			sql = "SELECT user_from, first_name, last_name, message, date FROM messages m JOIN user u ON m.user_from = u.username " + 
+				  "WHERE date IN (SELECT MAX(date) FROM messages " +
+				  "               WHERE user_to = ? " +
+				  "               GROUP BY user_from)" +
+				  "ORDER BY date DESC;";
+			st = connection.prepareStatement(sql);
+			st.setString(1, packet.username);
+			
+			ResultSet rs = st.executeQuery();
+			while(rs.next())
+			{
+				LastMessagePacket msg = new LastMessagePacket();		
+				msg.username = rs.getString("user_from");
+				msg.first_name = rs.getString("first_name");
+				msg.last_name = rs.getString("last_name");
+				msg.message = rs.getString("message");
+				msg.date = rs.getString("date");
+				if(msg.message.length() > 45)
+				{
+					msg.message = String.format("%s...", msg.message.substring(0,42));
+		        }
+				messages.add(msg);
+			}
+		}
+		catch(SQLException e) {e.printStackTrace();}
+		
+		p.messages = messages;
+		
+		return p;
+	}
+	
 	private String generateConfirmationCode(int length)
 	{
 		return new Random().ints((int)'0',(int)'Z'+1).filter(i-> (i<=(int)'9' || i>=(int)'A'))
                 .mapToObj(i -> String.valueOf((char)i)).limit(length).collect(Collectors.joining());
 	}
+
+	
 
 	
 }

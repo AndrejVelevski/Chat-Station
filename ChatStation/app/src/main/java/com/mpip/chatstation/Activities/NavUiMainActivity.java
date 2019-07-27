@@ -3,6 +3,7 @@ package com.mpip.chatstation.Activities;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import android.app.Application;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Button;
@@ -20,9 +21,11 @@ import com.mpip.chatstation.Models.User;
 import com.mpip.chatstation.Networking.KryoListener;
 import com.mpip.chatstation.Networking.SendPacketThread;
 import com.mpip.chatstation.Packets.RequestUserPacket;
+import com.mpip.chatstation.Packets.SystemMessagePacket;
 import com.mpip.chatstation.R;
 
-public class NavUiMainActivity extends AppCompatActivity {
+public class NavUiMainActivity extends AppCompatActivity
+{
 
     AHBottomNavigation bottomNavigation;
     public static String username_email;
@@ -97,5 +100,20 @@ public class NavUiMainActivity extends AppCompatActivity {
 
             return true;
         });
+    }
+
+    @Override
+    public void onBackPressed()
+    {
+        logout();
+    }
+
+    private void logout()
+    {
+        SystemMessagePacket packet = new SystemMessagePacket();
+        packet.type = SystemMessagePacket.Type.LOGOUT;
+        packet.message = String.format("User '%s' logged out.", user.username);
+        new SendPacketThread(packet).start();
+        finish();
     }
 }

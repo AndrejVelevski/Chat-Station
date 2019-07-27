@@ -11,6 +11,7 @@ import android.widget.ListView;
 import com.mpip.chatstation.Adapters.ChatMessageAdapter;
 import com.mpip.chatstation.Config.Constants;
 import com.mpip.chatstation.Models.User;
+import com.mpip.chatstation.Networking.KryoListener;
 import com.mpip.chatstation.Networking.SendPacketThread;
 import com.mpip.chatstation.Packets.MessagePacket;
 import com.mpip.chatstation.R;
@@ -30,6 +31,7 @@ public class ChatRoomActivity extends AppCompatActivity
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat_room);
+        KryoListener.currentActivity = this;
 
         lvMessageBox = findViewById(R.id.lvChatRoomMessageBox);
         messageAdapter = new ChatMessageAdapter(ChatRoomActivity.this);

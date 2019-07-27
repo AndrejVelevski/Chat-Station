@@ -1,5 +1,6 @@
 package com.mpip.chatstation.Adapters;
 
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.mpip.chatstation.Activities.PrivateChatActivity;
+import com.mpip.chatstation.Config.Constants;
 import com.mpip.chatstation.Models.User;
 import com.mpip.chatstation.R;
 
@@ -43,13 +46,16 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
             });
 
             btnMsgFriend.setOnClickListener(c->{
-                onClickMsgFriend();
+                onClickMsgFriend(friendListUsername.getText().toString());
             });
 
         }
 
-        public void onClickMsgFriend(){
-            //otvori go chatot so prijatelot
+        public void onClickMsgFriend(String username)
+        {
+            Intent intent = new Intent(parent.getContext(), PrivateChatActivity.class);
+            intent.putExtra(Constants.USERNAME, username);
+            parent.getContext().startActivity(intent);
         }
 
         private void onClickFriendProfile(){

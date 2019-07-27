@@ -10,6 +10,7 @@ import com.esotericsoftware.kryonet.Listener;
 import com.mpip.chatstation.Activities.ChatRoomActivity;
 import com.mpip.chatstation.Activities.MainActivity;
 import com.mpip.chatstation.Activities.NavUiMainActivity;
+import com.mpip.chatstation.Activities.PrivateChatActivity;
 import com.mpip.chatstation.Config.Constants;
 import com.mpip.chatstation.Config.UserLoginDetails;
 import com.mpip.chatstation.Fragments.ConfirmFragment;
@@ -22,8 +23,11 @@ import com.mpip.chatstation.Fragments.SignUpFragment;
 import com.mpip.chatstation.Models.ChatMessage;
 import com.mpip.chatstation.Models.User;
 import com.mpip.chatstation.Packets.MessagePacket;
+import com.mpip.chatstation.Packets.PrivateMessagePacket;
 import com.mpip.chatstation.Packets.ReceiveFriendRequestsPacket;
 import com.mpip.chatstation.Packets.ReceiveFriendsPacket;
+import com.mpip.chatstation.Packets.ReceiveLastMessagesPacket;
+import com.mpip.chatstation.Packets.ReceiveMessagesHistoryPacket;
 import com.mpip.chatstation.Packets.ReceiveRandomChatPacket;
 import com.mpip.chatstation.Packets.ReceiveUserPacket;
 import com.mpip.chatstation.Packets.SystemMessagePacket;
@@ -174,6 +178,7 @@ public class KryoListener
                             break;
                         }
                         case FRIEND_REQUEST:
+                        case MESSAGE:
                         {
                             currentActivity.runOnUiThread(new Runnable()
                             {
@@ -252,6 +257,40 @@ public class KryoListener
                         }
                     });
                 }
+                else if (object instanceof ReceiveMessagesHistoryPacket)
+                {
+                    ReceiveMessagesHistoryPacket packet = (ReceiveMessagesHistoryPacket)object;
+
+                    currentActivity.runOnUiThread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            //ova da se napravi vo chatmessage adapterot so funkcija updateData
+                            for (PrivateMessagePacket msg : packet.messages)
+                            {
+                                boolean belongsToMe = msg.user_from.equals(NavUiMainActivity.user.username);
+                                PrivateChatActivity.messageAdapter.add(new ChatMessage(msg.message,msg.user_from,belongsToMe, msg.date, MessagePacket.Type.MESSAGE));
+                                PrivateChatActivity.lvMessageBox.setSelection(PrivateChatActivity.lvMessageBox.getCount() - 1);
+                            }
+                        }
+                    });
+                }
+                else if (object instanceof PrivateMessagePacket)
+                {
+                    PrivateMessagePacket packet = (PrivateMessagePacket)object;
+
+                    currentActivity.runOnUiThread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            boolean belongsToMe = packet.user_from.equals(NavUiMainActivity.user.username);
+                            PrivateChatActivity.messageAdapter.add(new ChatMessage(packet.message,packet.user_from,belongsToMe, packet.date, MessagePacket.Type.MESSAGE));
+                            PrivateChatActivity.lvMessageBox.setSelection(PrivateChatActivity.lvMessageBox.getCount() - 1);
+                        }
+                    });
+                }
                 else if (object instanceof ReceiveFriendRequestsPacket)
                 {
                     ReceiveFriendRequestsPacket packet = (ReceiveFriendRequestsPacket)object;
@@ -288,6 +327,19 @@ public class KryoListener
                         public void run()
                         {
                             FriendRequestsFragment.friendListAdapter.updateData(users);
+                        }
+                    });
+                }
+                else if (object instanceof ReceiveLastMessagesPacket)
+                {
+                    ReceiveLastMessagesPacket packet = (ReceiveLastMessagesPacket)object;
+
+                    currentActivity.runOnUiThread(new Runnable()
+                    {
+                        @Override
+                        public void run()
+                        {
+                            MessagesFragment.lastMessagesAdapter.updateData(packet.messages);
                         }
                     });
                 }
