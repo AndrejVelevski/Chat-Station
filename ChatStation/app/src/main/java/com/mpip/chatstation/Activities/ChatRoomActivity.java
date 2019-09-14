@@ -37,11 +37,6 @@ public class ChatRoomActivity extends AppCompatActivity
         setContentView(R.layout.activity_chat_room);
         KryoListener.currentActivity = this;
 
-//        rcMessageBox =
-//        messageAdapter = new ChatMessageAdapter(ChatRoomActivity.this);
-//        etMessage = findViewById(R.id.etChatRoomMessage);
-//        rcMessageBox.setAdapter(messageAdapter);
-
         etMessage = findViewById(R.id.etChatRoomMessage);
         rcMessageBox = findViewById(R.id.lvChatRoomMessageBox);
         layoutManager = new LinearLayoutManager(this);

@@ -171,6 +171,8 @@ public class Main
 	    
 	    boolean systemOnline = true;
 	    
+	    new CheckConnectionsThread(server, connectedUsers, chatrooms).start();
+	    
 	    Scanner scan = new Scanner(System.in);
 	    
 	    while(systemOnline)

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.mpip.chatstation.Adapters.ChatMessageAdapter.Type.MESSAGE;
+import static com.mpip.chatstation.Adapters.ChatMessageAdapter.Type.MESSAGE_R;
 
 
 public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageViewHolder> {
@@ -37,20 +38,18 @@ public class ChatMessageAdapter extends RecyclerView.Adapter<ChatMessageViewHold
     public int getItemViewType(int position) {
         ChatMessage cm = chatMessages.get(position);
 
-        //ova temporary e
-        if(!cm.isBelongsToCurrentUser()) return Type.MESSAGE_R.ordinal();
-
-        switch (cm.getType()){
-            case MESSAGE:
-                return Type.MESSAGE.ordinal();
-            case JOIN:
-                return Type.JOIN.ordinal();
-            case LEAVE:
-                return Type.LEAVE.ordinal();
-            case TOSELF:
-                return Type.TOSELF.ordinal();
+        switch (cm.getType())
+        {
+            case JOIN: return Type.JOIN.ordinal();
+            case LEAVE: return Type.LEAVE.ordinal();
+            case TOSELF: return Type.TOSELF.ordinal();
             default:
-                return Type.MESSAGE.ordinal();
+            {
+                if (!cm.isBelongsToCurrentUser())
+                    return MESSAGE_R.ordinal();
+                else
+                    return MESSAGE.ordinal();
+            }
         }
     }
 
