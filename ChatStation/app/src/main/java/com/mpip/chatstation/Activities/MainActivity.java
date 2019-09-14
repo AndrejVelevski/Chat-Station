@@ -165,7 +165,7 @@ public class MainActivity extends AppCompatActivity
             super.onBackPressed();
     }
 
-    private void connectToServer()
+    public static void connectToServer()
     {
         try
         {
@@ -177,14 +177,14 @@ public class MainActivity extends AppCompatActivity
                 thread.join();
             }
             catch (InterruptedException e) {e.printStackTrace();}
-            if (thread.connectionSuccessful)
+            /*if (thread.connectionSuccessful)
             {
                 Toast.makeText(this,"Connected to server",Toast.LENGTH_LONG).show();
             }
             else
             {
                 Toast.makeText(this,"Failed to connect to server",Toast.LENGTH_LONG).show();
-            }
+            }*/
         }
         catch(Exception e) { e.printStackTrace();}
     }

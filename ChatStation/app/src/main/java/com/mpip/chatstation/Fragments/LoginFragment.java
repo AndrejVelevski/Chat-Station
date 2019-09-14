@@ -3,6 +3,8 @@ package com.mpip.chatstation.Fragments;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.XmlResourceParser;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.text.InputType;
 import android.text.method.HideReturnsTransformationMethod;
@@ -199,6 +201,17 @@ public class LoginFragment extends Fragment implements OnClickListener {
     // Check Validation before login
     private void checkValidation()
     {
+        if(!isNetworkStatusAvialable(context))
+        {
+            Toast.makeText(context, "You don't have an internet connection.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (!MainActivity.client.isConnected())
+        {
+            MainActivity.connectToServer();
+        }
+
         // Get email id and password
         String getEmailId = emailid.getText().toString();
         String getPassword = password.getText().toString();
@@ -209,7 +222,7 @@ public class LoginFragment extends Fragment implements OnClickListener {
             showError("Enter both credentials.");
         }
         else
-            {
+        {
             LoginUserPacket packet = new LoginUserPacket();
             packet.username_email = getEmailId;
             packet.password = BCrypt.hashpw(getPassword, Constants.SALT);
@@ -224,5 +237,17 @@ public class LoginFragment extends Fragment implements OnClickListener {
             new CustomToast().Show_Toast(context, view,
                     msg);
         });
+    }
+
+    public static boolean isNetworkStatusAvialable (Context context) {
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null)
+        {
+            NetworkInfo netInfos = connectivityManager.getActiveNetworkInfo();
+            if(netInfos != null)
+                if(netInfos.isConnected())
+                    return true;
+        }
+        return false;
     }
 }

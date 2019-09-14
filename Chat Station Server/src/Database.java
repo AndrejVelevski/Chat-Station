@@ -206,7 +206,7 @@ public class Database
 			st.setBoolean(7, true);
 			st.setString(8, LocalDateTime.now().toString());
 			st.execute();
-			//sendConfirmationCode(user.email, user.username);
+			sendConfirmationCode(user.email, user.username);
 		} catch (SQLException e){e.printStackTrace();}
 	}
 	
