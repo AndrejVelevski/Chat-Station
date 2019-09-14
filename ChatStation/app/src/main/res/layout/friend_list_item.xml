@@ -58,7 +58,6 @@
         android:layout_height="50dp"
         android:src="@drawable/home_person"
         android:tint="@color/colorPrimary"
-        android:onClick="sendFriendRequest"
         android:background="@null"
         android:text="Send" />
 
@@ -69,7 +68,6 @@
         android:layout_height="50dp"
         android:src="@drawable/ic_message_black_24dp"
         android:tint="@color/colorPrimary"
-        android:onClick="sendFriendRequest"
         android:background="@null"
         android:text="Send" />
 
