@@ -16,6 +16,7 @@ public class UserDetailsActivity extends AppCompatActivity
     private TextView tvFirstName;
     private TextView tvLastName;
     private TextView tvAge;
+    private TextView tvRegisteredOn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -33,7 +34,8 @@ public class UserDetailsActivity extends AppCompatActivity
         tvUsername.setText(user.username);
         tvFirstName.setText(user.first_name);
         tvLastName.setText(user.last_name);
-        tvAge.setText(user.age);
+        tvAge.setText(user.age.toString());
+        tvRegisteredOn.setText(user.registered_on);
     }
 
     private void initUI(){
@@ -41,5 +43,6 @@ public class UserDetailsActivity extends AppCompatActivity
         tvFirstName = findViewById(R.id.userInfoFirstName);
         tvLastName = findViewById(R.id.userInfoLastName);
         tvAge = findViewById(R.id.userInfoAge);
+        tvRegisteredOn = findViewById(R.id.userInfoRegisteredOn);
     }
 }
