@@ -14,6 +14,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.mpip.chatstation.Activities.PrivateChatActivity;
 import com.mpip.chatstation.Config.Constants;
 import com.mpip.chatstation.Models.User;
+import com.mpip.chatstation.Networking.SendPacketThread;
+import com.mpip.chatstation.Packets.RequestUserPacket;
 import com.mpip.chatstation.R;
 
 import java.util.ArrayList;
@@ -38,11 +40,11 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
             friendListUsername = view.findViewById(R.id.friendListUsername);
 
             btnFriendListPic.setOnClickListener(c->{
-                onClickFriendProfile();
+                onClickFriendProfile(friendListUsername.getText().toString());
             });
 
             btnFriendInfo.setOnClickListener(c->{
-                onClickFriendProfile();
+                onClickFriendProfile(friendListUsername.getText().toString());
             });
 
             btnMsgFriend.setOnClickListener(c->{
@@ -58,8 +60,11 @@ public class FriendListAdapter extends RecyclerView.Adapter<FriendListAdapter.Fr
             parent.getContext().startActivity(intent);
         }
 
-        private void onClickFriendProfile(){
-            //odnesi go na kliknatiot profil
+        private void onClickFriendProfile(String username)
+        {
+            RequestUserPacket packet = new RequestUserPacket();
+            packet.username_email = username;
+            new SendPacketThread(packet).start();
         }
     }
 

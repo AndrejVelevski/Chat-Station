@@ -270,9 +270,9 @@ public class Main
 	private static void requestUser(Connection connection, RequestUserPacket packet)
 	{
 		ReceiveUserPacket user = db.getUser(packet.username_email);
-		connectedUsers.put(connection.getID(), new User(connection, user.username));
-		System.out.println(String.format("Logged in user '%s'...", packet.username_email));
+		user.toSelf = false;
 		connection.sendTCP(user);
+		
 	}
 
 	private static void resendCode(Connection connection, ResendCodePacket packet)

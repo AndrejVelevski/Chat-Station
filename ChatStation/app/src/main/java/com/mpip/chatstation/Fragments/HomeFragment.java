@@ -1,6 +1,6 @@
 package com.mpip.chatstation.Fragments;
 
-import android.graphics.Color;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,8 +20,8 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 import com.mpip.chatstation.Activities.NavUiMainActivity;
+import com.mpip.chatstation.Activities.UserDetailsActivity;
 import com.mpip.chatstation.Config.Constants;
-import com.mpip.chatstation.Models.User;
 import com.mpip.chatstation.Networking.SendPacketThread;
 import com.mpip.chatstation.Packets.FriendRequestPacket;
 import com.mpip.chatstation.Packets.RequestRandomChatPacket;
@@ -111,7 +111,7 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
                 sendFriendRequest();
                 break;
             case R.id.viewUserInfo:
-                //open user's info fragment/activity
+                userDetails();
                 break;
         }
     }
@@ -193,6 +193,13 @@ public class HomeFragment extends Fragment implements View.OnClickListener {
         {
             new SendPacketThread(packet).start();
         }
+    }
+
+    public void userDetails()
+    {
+        Intent intent = new Intent(context, UserDetailsActivity.class);
+        intent.putExtra(Constants.USER, NavUiMainActivity.user);
+        startActivity(intent);
     }
 
     public static void showError(String msg){

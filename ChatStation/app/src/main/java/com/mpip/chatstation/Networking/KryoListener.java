@@ -11,6 +11,7 @@ import com.mpip.chatstation.Activities.ChatRoomActivity;
 import com.mpip.chatstation.Activities.MainActivity;
 import com.mpip.chatstation.Activities.NavUiMainActivity;
 import com.mpip.chatstation.Activities.PrivateChatActivity;
+import com.mpip.chatstation.Activities.UserDetailsActivity;
 import com.mpip.chatstation.Adapters.ChatMessageAdapter;
 import com.mpip.chatstation.Config.Constants;
 import com.mpip.chatstation.Config.UserLoginDetails;
@@ -49,12 +50,14 @@ public class KryoListener
     private static Intent goToMainIntent;
     private static Intent goToChatRoomIntent;
     private static Intent goToNAVuiIntent;
+    private static Intent goToUserDetailsIntent;
 
     public static void createListener()
     {
         goToMainIntent = new Intent(currentActivity, MainActivity.class);
         goToChatRoomIntent = new Intent(currentActivity, ChatRoomActivity.class);
         goToNAVuiIntent = new Intent(currentActivity, NavUiMainActivity.class);
+        goToUserDetailsIntent = new Intent(currentActivity, UserDetailsActivity.class);
 
         listener = new Listener()
         {
@@ -202,21 +205,23 @@ public class KryoListener
                 else if (object instanceof ReceiveUserPacket)
                 {
                     ReceiveUserPacket packet = (ReceiveUserPacket)object;
+                    User user = new User();
+                    user.email = packet.email;
+                    user.username = packet.username;
+                    user.first_name = packet.first_name;
+                    user.last_name = packet.last_name;
+                    user.age = packet.age;
+                    user.registered_on = packet.registered_on;
+                    user.last_login = packet.last_login;
 
                     if (packet.toSelf)
                     {
-                        NavUiMainActivity.user = new User();
-                        NavUiMainActivity.user.email = packet.email;
-                        NavUiMainActivity.user.username = packet.username;
-                        NavUiMainActivity.user.first_name = packet.first_name;
-                        NavUiMainActivity.user.last_name = packet.last_name;
-                        NavUiMainActivity.user.age = packet.age;
-                        NavUiMainActivity.user.registered_on = packet.registered_on;
-                        NavUiMainActivity.user.last_login = packet.last_login;
+                        NavUiMainActivity.user = user;
                     }
                     else
                     {
-                        //ako gledas profil na nekoj drug
+                        goToUserDetailsIntent.putExtra(Constants.USER, user);
+                        currentActivity.startActivity(goToUserDetailsIntent);
                     }
                 }
                 else if (object instanceof ReceiveRandomChatPacket)
