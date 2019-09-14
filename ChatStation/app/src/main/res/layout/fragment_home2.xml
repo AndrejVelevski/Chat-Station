@@ -194,7 +194,7 @@
                 android:shadowDx="1"
                 android:shadowDy="1"
                 android:shadowRadius="2"
-                android:text="User's information"
+                android:text="@string/user_info"
                 android:textAllCaps="true"
                 android:textColor="@color/white"
                 android:textSize="20sp"

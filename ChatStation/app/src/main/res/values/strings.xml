@@ -25,4 +25,6 @@
     <string name="confirmationHint">Confirmation Code</string>
     <string name="confirm_account_resend_info">Have trouble finding the code? No worries! Click below to resend the confirmation code.</string>
     <string name="confirm_resend">Resend Confirmation Code</string>
+    <string name="user_info">User\'s Information</string>
+    <string name="user_info_hidden">Hidden</string>
 </resources>
