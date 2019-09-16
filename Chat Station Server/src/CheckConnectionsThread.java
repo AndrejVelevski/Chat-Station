@@ -41,7 +41,7 @@ public class CheckConnectionsThread extends Thread
 	    		
 	    		if (!connections.contains(id))
 	    		{
-	    			System.out.println(String.format("User '%d' lost connection.", connectedUsers.get(id).connection.getID()));
+	    			System.out.println(String.format("User '%s' lost connection.", connectedUsers.get(id).username));
 	    			remove.add(id);
 	    		}
 	    	});

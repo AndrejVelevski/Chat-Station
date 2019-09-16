@@ -247,7 +247,7 @@ public class Main
 			connectedUsers.put(connection.getID(), new User(connection, user.username));
 			user.toSelf = true;
 			connection.sendTCP(user);
-			System.out.println(String.format("User %s logged in.", user.username));
+			System.out.println(String.format("User '%s' logged in.", user.username));
 		}
 		catch (IncorrectUsernameOrPasswordException e)
 		{
