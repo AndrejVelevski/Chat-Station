@@ -528,8 +528,6 @@ public class Database
 		
 		p.messages = messages;
 		
-		messages.stream().forEach(m -> System.out.println(m.messaage));
-		
 		return p;
 	}
 	

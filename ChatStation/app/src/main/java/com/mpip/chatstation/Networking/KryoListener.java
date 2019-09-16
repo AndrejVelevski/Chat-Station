@@ -184,14 +184,17 @@ public class KryoListener
                         case FRIEND_REQUEST:
                         case MESSAGE:
                         {
-                            currentActivity.runOnUiThread(new Runnable()
+                            if (!currentActivity.getClass().equals(PrivateChatActivity.class))
                             {
-                                @Override
-                                public void run()
+                                currentActivity.runOnUiThread(new Runnable()
                                 {
-                                    HomeFragment.showSuccess(systemMessage.message);
-                                }
-                            });
+                                    @Override
+                                    public void run()
+                                    {
+                                        HomeFragment.showSuccess(systemMessage.message);
+                                    }
+                                });
+                            }
                             break;
                         }
                         case SERVER_CLOSED:
