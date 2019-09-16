@@ -288,18 +288,21 @@ public class KryoListener
                 }
                 else if (object instanceof PrivateMessagePacket)
                 {
-                    PrivateMessagePacket packet = (PrivateMessagePacket)object;
-
-                    currentActivity.runOnUiThread(new Runnable()
+                    if (PrivateChatActivity.messageAdapter != null)
                     {
-                        @Override
-                        public void run()
+                        PrivateMessagePacket packet = (PrivateMessagePacket)object;
+
+                        currentActivity.runOnUiThread(new Runnable()
                         {
-                            boolean belongsToMe = packet.user_from.equals(NavUiMainActivity.user.username);
-                            PrivateChatActivity.messageAdapter.addChatMessage(new ChatMessage(packet.message,packet.user_from,belongsToMe, packet.date, MessagePacket.Type.MESSAGE));
-                            PrivateChatActivity.rcMessageBox.smoothScrollToPosition(PrivateChatActivity.messageAdapter.getItemCount() - 1);
-                        }
-                    });
+                            @Override
+                            public void run()
+                            {
+                                boolean belongsToMe = packet.user_from.equals(NavUiMainActivity.user.username);
+                                PrivateChatActivity.messageAdapter.addChatMessage(new ChatMessage(packet.message,packet.user_from,belongsToMe, packet.date, MessagePacket.Type.MESSAGE));
+                                PrivateChatActivity.rcMessageBox.smoothScrollToPosition(PrivateChatActivity.messageAdapter.getItemCount() - 1);
+                            }
+                        });
+                    }
                 }
                 else if (object instanceof ReceiveFriendRequestsPacket)
                 {

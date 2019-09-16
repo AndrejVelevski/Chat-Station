@@ -187,11 +187,6 @@ public class Database
 				throw new UsernameAlreadyExistsException(String.format("Username %s already exists.", user.username));
 		} catch (SQLException e) {e.printStackTrace();}
 		
-		sql =
-		String.format(
-		  "INSERT INTO user(username, email, password, first_name, last_name, age, confirmed, registered_on) "
-		+ "VALUES('%s', '%s', '%s', '%s', '%s', %d, %b, '%s');",
-		user.username, user.email, user.password, user.first_name, user.last_name, user.age, true, LocalDateTime.now());
 		try
 		{
 			sql = "INSERT INTO user(username, email, password, first_name, last_name, age, confirmed, registered_on) "
@@ -202,8 +197,11 @@ public class Database
 			st.setString(3, user.password);
 			st.setString(4, user.first_name);
 			st.setString(5, user.last_name);
-			st.setInt(6, user.age);
-			st.setBoolean(7, true);
+			if (user.age == null)
+				st.setNull(6, java.sql.Types.INTEGER);
+			else
+				st.setInt(6, user.age);
+			st.setBoolean(7, false);
 			st.setString(8, LocalDateTime.now().toString());
 			st.execute();
 			sendConfirmationCode(user.email, user.username);
@@ -505,7 +503,8 @@ public class Database
 		try
 		{
 			sql = "SELECT * FROM messages "
-				+ "WHERE (user_from = ? AND user_to = ?) OR (user_from = ? AND user_to = ?);";
+				+ "WHERE (user_from = ? AND user_to = ?) OR (user_from = ? AND user_to = ?) "
+				+ "ORDER BY date;";
 			st = connection.prepareStatement(sql);
 			st.setString(1, packet.user_from);
 			st.setString(2, packet.user_to);
@@ -528,6 +527,8 @@ public class Database
 		catch (SQLException e) {e.printStackTrace();}
 		
 		p.messages = messages;
+		
+		messages.stream().forEach(m -> System.out.println(m.messaage));
 		
 		return p;
 	}
