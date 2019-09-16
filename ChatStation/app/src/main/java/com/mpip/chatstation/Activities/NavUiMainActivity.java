@@ -110,6 +110,12 @@ public class NavUiMainActivity extends AppCompatActivity
         logout();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        KryoListener.currentActivity = this;
+    }
+
     private void logout()
     {
         SystemMessagePacket packet = new SystemMessagePacket();

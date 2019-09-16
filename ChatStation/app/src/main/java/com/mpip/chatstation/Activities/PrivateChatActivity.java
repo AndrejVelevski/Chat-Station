@@ -61,4 +61,6 @@ public class PrivateChatActivity extends AppCompatActivity
             etMessage.setText("");
         }
     }
+
+
 }

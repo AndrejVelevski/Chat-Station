@@ -184,6 +184,7 @@ public class KryoListener
                         case FRIEND_REQUEST:
                         case MESSAGE:
                         {
+                            System.out.println("DEBUG::" + currentActivity.getLocalClassName());
                             if (!currentActivity.getClass().equals(PrivateChatActivity.class))
                             {
                                 currentActivity.runOnUiThread(new Runnable()
