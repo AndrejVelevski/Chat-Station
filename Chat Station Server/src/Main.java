@@ -317,12 +317,10 @@ public class Main
 		
 		boolean anyRoomSize = packet.maxUsers<2;
 		
-		System.out.println(receiveRandomChatPacket.roomTags);
 		tags.stream().forEach(t -> System.out.println(t));
 		
 		if (tags.size() == 0)
 		{
-			System.out.println("Branch: 1");
 			chatroom = chatrooms.stream()
 								.filter(c -> c.users.size() < c.maxUsers)
      							.filter(c -> anyRoomSize || c.maxUsers == packet.maxUsers)
@@ -332,18 +330,17 @@ public class Main
 		}
 		else
 		{
-			System.out.println("Branch: 2");
 	        chatroom = chatrooms.stream()
 	        					.filter(c -> c.users.size() < c.maxUsers)
 	        					.filter(c -> anyRoomSize || c.maxUsers == packet.maxUsers)
 	        					.filter(c -> c.tags.size() > 0)
 	        					.max((c1, c2) -> {return (int) (c1.tags.stream().filter(tags::contains).count() - c2.tags.stream().filter(tags::contains).count());})
+	        					.filter(c -> c.tags.stream().filter(tags::contains).count() > 0)
 	        					.orElse(null);
 		}
 		
-		if (chatroom != null && chatroom.tags.stream().filter(tags::contains).count()>0)
+		if (chatroom != null)
 		{
-			System.out.println("Branch: 3");
 			receiveRandomChatPacket.found = true;
 			receiveRandomChatPacket.maxUsers = chatroom.maxUsers;
 			if (tags.size() > 0)
@@ -357,7 +354,6 @@ public class Main
 		}
 		else
 		{
-			System.out.println("Branch: 4");
 			receiveRandomChatPacket.found = false;
 			receiveRandomChatPacket.maxUsers = packet.maxUsers<2 ? 2:packet.maxUsers;
 			if (tags.size() > 0)
