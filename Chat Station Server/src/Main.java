@@ -317,8 +317,6 @@ public class Main
 		
 		boolean anyRoomSize = packet.maxUsers<2;
 		
-		tags.stream().forEach(t -> System.out.println(t));
-		
 		if (tags.size() == 0)
 		{
 			chatroom = chatrooms.stream()
